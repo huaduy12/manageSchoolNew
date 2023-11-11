@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+
+<head>
+  <title>Thông tin giáo viên bộ môn</title>
+  <th:block th:replace="fragment/header :: html_head"></th:block>
+
+</head>
+
+<body>
+
+<!--*******************
+    Preloader start
+********************-->
+<div id="preloader">
+  <div class="loader">
+    <svg class="circular" viewBox="25 25 50 50">
+      <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="3" stroke-miterlimit="10" />
+    </svg>
+  </div>
+</div>
+<!--*******************
+    Preloader end
+********************-->
+
+
+<!--**********************************
+    Main wrapper start
+***********************************-->
+<div id="main-wrapper">
+
+  <!--**********************************
+      Nav header start
+  ***********************************-->
+  <div th:replace="fragment/header :: nav_header">
+  </div>
+  <!--**********************************
+      Nav header end
+  ***********************************-->
+
+  <!--**********************************
+      Header start
+  ***********************************-->
+  <div th:replace="fragment/header :: header">
+  </div>
+  <!--**********************************
+      Header end ti-comment-alt
+  ***********************************-->
+
+  <!--**********************************
+      Sidebar start
+  ***********************************-->
+  <div th:replace="fragment/header :: nk_sidebar"></div>
+  <!--**********************************
+      Sidebar end
+  ***********************************-->
+
+  <!--**********************************
+      Content body start
+  ***********************************-->
+  <div class="content-body">
+
+    <div class="row page-titles mx-0">
+      <div class="col p-md-0">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="javascript:void(0)">Dashboard</a></li>
+          <li class="breadcrumb-item active"><a href="javascript:void(0)">Giáo viên</a></li>
+        </ol>
+      </div>
+    </div>
+    <!-- row -->
+
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-body">
+              <h4 class="card-title">Thông tin giáo viên bộ môn lớp <span th:if="${classroom}" th:text="${classroom.name}"></span></h4>
+              <div class="table-responsive">
+
+                <table class="table table-striped table-bordered zero-configuration">
+
+                  <thead>
+                  <tr>
+                    <th>STT</th>
+                    <th>Tên</th>
+                    <th>Vai trò</th>
+                    <th>Số điện thoại</th>
+                    <th>Năm học</th>
+                    <th>Kỳ học</th>
+                    <th>Môn học</th>
+                    <th>Trạng thái</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr th:each="subjectTeacher,idx : ${teacher_classes}">
+                    <td th:text="${idx.index+1}"></td>
+                    <td th:text="${subjectTeacher.teacher.fullName}"></td>
+                    <td th:text="${subjectTeacher.teacher.role.getDisplayName()}"></td>
+                    <td th:text="${subjectTeacher.teacher.phoneNumber}" ></td>
+                    <td th:text="${subjectTeacher.school_year.name}" ></td>
+                    <td th:text="${subjectTeacher.semester.name}" ></td>
+                    <td th:text="${subjectTeacher.subject} ? ${subjectTeacher.subject.name} : '' "></td>
+                    <td th:text="${subjectTeacher.teacher.status} ? 'Đang dạy' : 'Đã nghỉ'"
+                        th:classappend="${subjectTeacher.teacher.status} ? 'text-success' : 'text-danger'"></td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- #/ container -->
+  </div>
+  <!--**********************************
+      Content body end
+  ***********************************-->
+
+
+  <!--**********************************
+      Footer start
+  ***********************************-->
+  <div th:replace="fragment/footer :: footer">
+  </div>
+  <!--**********************************
+      Footer end
+  ***********************************-->
+</div>
+<!--**********************************
+    Main wrapper end
+***********************************-->
+
+<!-- Modal -->
+<div class="modal fade" id="modalAddEdit" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Giáo viên</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="name">Tên</label>
+            <input type="text" class="form-control" id="name">
+          </div>
+          <div class="form-group">
+            <label for="exampleFormControlSelect1">Vai trò</label>
+            <select class="form-control" id="exampleFormControlSelect1">
+              <option>Giáo viên</option>
+              <option>Công vụ</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="phone">Số điện thoại</label>
+            <input type="text" class="form-control" id="phone">
+          </div>
+          <div class="form-group">
+            <label for="birthday">Ngày sinh</label>
+            <input type="date" class="form-control" id="birthday">
+          </div>
+          <div class="form-group">
+            <label for="address">Địa chỉ</label>
+            <input type="text" class="form-control" id="address">
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+          <button type="button" class="btn btn-primary">Lưu</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="modalDelete">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Xác nhận</h5>
+        <button type="button" class="close" data-dismiss="modal"><span>&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">Bạn có chắc chắn muốn xóa không ?</div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Không</button>
+        <button type="button" class="btn btn-primary">Đồng ý</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--**********************************
+    Scripts
+***********************************-->
+<script th:src="@{/plugins/common/common.min.js}"></script>
+<script th:src="@{/js/custom.min.js}"></script>
+<script th:src="@{/js/settings.js}"></script>
+<script th:src="@{/js/gleek.js}"></script>
+<script th:src="@{/js/styleSwitcher.js}"></script>
+
+<script th:src="@{/plugins/tables/js/jquery.dataTables.min.js}"></script>
+<script th:src="@{/plugins/tables/js/datatable/dataTables.bootstrap4.min.js}"></script>
+<script th:src="@{/plugins/tables/js/datatable-init/datatable-basic.min.js}"></script>
+</body>
+
+</html>

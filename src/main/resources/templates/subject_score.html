@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Điểm môn học</title>
+    <th:block th:replace="fragment/header :: html_head"></th:block>
+
+    <style>
+        td input{
+            width: 60%;
+            text-align: center;
+        }
+        td{
+            text-align: center;
+        }
+        .border-red{
+            border: 2px solid red;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!--*******************
+        Preloader start
+    ********************-->
+    <div id="preloader">
+        <div class="loader">
+            <svg class="circular" viewBox="25 25 50 50">
+                <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="3" stroke-miterlimit="10" />
+            </svg>
+        </div>
+    </div>
+    <!--*******************
+        Preloader end
+    ********************-->
+
+    
+    <!--**********************************
+        Main wrapper start
+    ***********************************-->
+    <div id="main-wrapper">
+
+        <!--**********************************
+            Nav header start
+        ***********************************-->
+        <div th:replace="fragment/header :: nav_header">
+        </div>
+        <!--**********************************
+            Nav header end
+        ***********************************-->
+
+        <!--**********************************
+            Header start
+        ***********************************-->
+        <div th:replace="fragment/header :: header">
+        </div>
+        <!--**********************************
+            Header end ti-comment-alt
+        ***********************************-->
+
+        <!--**********************************
+            Sidebar start
+        ***********************************-->
+        <div th:replace="fragment/header :: nk_sidebar"></div>
+        <!--**********************************
+            Sidebar end
+        ***********************************-->
+
+        <!--**********************************
+            Content body start
+        ***********************************-->
+        <div class="content-body">
+
+            <div class="row page-titles mx-0">
+                <div class="col p-md-0">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="javascript:void(0)">Dashboard</a></li>
+                        <li class="breadcrumb-item active"><a href="javascript:void(0)">Bảng điểm</a></li>
+                    </ol>
+                </div>
+            </div>
+            <!-- row -->
+
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="card-title">Danh sách điểm môn học</h4>
+                                 <p th:if="${nameStudent}" th:text="'Học sinh: ' + ${nameStudent}" class="mr-2"></p>
+                                <div class="table-responsive">
+
+                                    <table class="table table-striped table-bordered zero-configuration">
+                                        <p class="text-danger" th:if="${errorScore}" th:text="${errorScore}"> </p>
+                                        <thead>
+                                            <tr>
+                                                <th>Năm học</th>
+                                                <th>Kỳ học</th>
+                                                <th>Môn học</th>
+                                                <th>Điểm miệng</th>
+                                                <th>Kiểm tra 15p</th>
+                                                <th>Điểm 1 tiết</th>
+                                                <th>Điểm thi</th>
+                                                <th>Điểm trung bình</th>
+                                                <th>Chức năng</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+
+                                            <tr th:each="score : ${scoreDtos}">
+
+                                                <td th:text="${score.school_year.name}"></td>
+                                                <td th:text="${score.semester.name}"></td>
+                                                <td th:text="${score.subject.name}" d></td>
+                                                <td>
+                                                    <input th:classappend="${score.id == errorOvalScoreId} ? 'border-red' : ''" type="text" class= "ovalScore " name="oval_score" th:value="${score.oval_score != null ? score.oval_score : ''}">
+                                                </td>
+                                                <td>
+                                                    <input th:classappend="${score.id == errorScore15Id} ? 'border-red' : ''" type="text"  class="score_15 " name="score_15" th:value="${score.score_15 != null ? score.score_15 : ''}">
+                                                </td>
+                                                <td>
+                                                    <input th:classappend="${score.id == errorScore1Id} ? 'border-red' : ''" type="text" class="score_1 " name="score_1_period" th:value="${score.score_1_period != null ? score.score_1_period : ''}">
+                                                </td>
+                                                <td>
+                                                    <input th:classappend="${score.id == errorScoreTestId} ? 'border-red' : ''" type="text" class="scoreTest " name="test_score" th:value="${score.test_score != null ? score.test_score : ''}">
+                                                </td>
+                                                <td th:text="${score.medium_score != null ? score.medium_score : ''}"></td>
+                                                <td th:data-id="${score.id}">
+                                                    <button type="button" class="btn btn-primary update-button" data-toggle="modal" data-target="#modalUpdate" >Cập nhập</button>
+                                                </td>
+                                            </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- #/ container -->
+        </div>
+        <!--**********************************
+            Content body end
+        ***********************************-->
+        
+        
+        <!--**********************************
+            Footer start
+        ***********************************-->
+        <div th:replace="fragment/footer :: footer">
+        </div>
+        <!--**********************************
+            Footer end
+        ***********************************-->
+    </div>
+    <!--**********************************
+        Main wrapper end
+    ***********************************-->
+
+<!-- Modal -->
+
+
+
+<div class="modal fade" id="modalUpdate">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Xác nhận</h5>
+                <button type="button" class="close" data-dismiss="modal"><span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">Bạn có chắc chắn muốn cập nhập không ?</div>
+            <div class="modal-footer">
+               <form method="post" th:action="@{/manage/score/save}" th:object="${scoreDto}">
+                   <button type="button" class="btn btn-secondary" data-dismiss="modal">Không</button>
+                   <input type="hidden" name="teacher_classId" th:value="${teacher_classId}">
+                   <input type="hidden" id="id" th:field="*{id}"/>
+                   <input type="hidden" id="oval-score" th:field="*{oval_score}"/>
+                   <input type="hidden" id="score15" th:field="*{score_15}"/>
+                   <input type="hidden" id="score-1" th:field="*{score_1_period}"/>
+                   <input type="hidden" id="score-test" th:field="*{test_score}"/>
+
+                   <button type="submit" class="btn btn-primary">Đồng ý</button>
+               </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    <script>
+        $(document).ready(function (){
+            $(".update-button").click(function (){
+
+                var id = $(this).parent().data("id")
+
+                var button = $(this);
+                var row = button.closest("tr");
+                var ovalScore = row.find(".ovalScore").val();
+                var score15 = row.find(".score_15").val();
+                var score1 = row.find(".score_1").val();
+                var scoreTest = row.find(".scoreTest").val();
+
+                // Gán giá trị cho các trường input trong modal
+                $("#id").val(id);
+                $("#oval-score").val(ovalScore);
+                $("#score15").val(score15);
+                $("#score-1").val(score1);
+                $("#score-test").val(scoreTest);
+            });
+
+        });
+
+    </script>
+
+
+    <script th:src="@{/plugins/toastr/js/toastr.min.js}"></script>
+    <script th:src="@{/plugins/toastr/js/toastr.init.js}"></script>
+
+
+    <script th:inline="javascript" th:if="${changeSuccess != null}">
+        toastr.success("Thay đổi thành công","Thành công", {
+            timeOut: 5e3,
+            closeButton: !0,
+            debug: !1,
+            newestOnTop: !0,
+            progressBar: !0,
+            positionClass: "toast-top-right",
+            preventDuplicates: !0,
+            onclick: null,
+            showDuration: "300",
+            hideDuration: "1000",
+            extendedTimeOut: "1000",
+            showEasing: "swing",
+            hideEasing: "linear",
+            showMethod: "fadeIn",
+            hideMethod: "fadeOut",
+            tapToDismiss: !1
+        });
+    </script>
+
+    <script th:inline="javascript" th:if="${changeFail != null}">
+        toastr.error( "Thay đổi thất bại","Thất bại", {
+            timeOut: 5e3,
+            closeButton: !0,
+            debug: !1,
+            newestOnTop: !0,
+            progressBar: !0,
+            positionClass: "toast-top-right",
+            preventDuplicates: !0,
+            onclick: null,
+            showDuration: "300",
+            hideDuration: "1000",
+            extendedTimeOut: "1000",
+            showEasing: "swing",
+            hideEasing: "linear",
+            showMethod: "fadeIn",
+            hideMethod: "fadeOut",
+            tapToDismiss: !1
+        });
+    </script>
+
+    <!--**********************************
+        Scripts
+    ***********************************-->
+    <script th:src="@{/plugins/common/common.min.js}"></script>
+    <script th:src="@{/js/custom.min.js}"></script>
+    <script th:src="@{/js/settings.js}"></script>
+    <script th:src="@{/js/gleek.js}"></script>
+    <script th:src="@{/js/styleSwitcher.js}"></script>
+
+    <script th:src="@{/plugins/tables/js/jquery.dataTables.min.js}"></script>
+    <script th:src="@{/plugins/tables/js/datatable/dataTables.bootstrap4.min.js}"></script>
+    <script th:src="@{/plugins/tables/js/datatable-init/datatable-basic.min.js}"></script>
+
+</body>
+
+</html>

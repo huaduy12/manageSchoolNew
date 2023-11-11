@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head th:fragment="html_head">
+  <meta charset="utf-8">
+<!--  <meta http-equiv="X-UA-Compatible" content="IE=edge">-->
+  <meta http-equiv="Content-Type" content="text/html">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+  <!-- Favicon icon -->
+  <link rel="icon" type="image/png" sizes="16x16" th:href="@{/images/favicon.png}">
+  <!-- Pignose Calender -->
+  <link th:href="@{/plugins/pg-calendar/css/pignose.calendar.min.css}" rel="stylesheet">
+  <!-- Chartist -->
+  <link rel="stylesheet" th:href="@{/plugins/chartist/css/chartist.min.css}">
+  <link rel="stylesheet" th:href="@{/plugins/chartist-plugin-tooltips/css/chartist-plugin-tooltip.css}">
+
+<!--  datatable-->
+  <link th:href="@{/plugins/tables/css/datatable/dataTables.bootstrap4.min.css}" rel="stylesheet">
+
+  <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700" rel="stylesheet" type="text/css">
+  <!--    <link th:href="@{/icons/font-awesome/css/font-awesome.min.css}" rel="stylesheet">-->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.5.5/css/simple-line-icons.css">
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+
+  <!--Toast thông báo -->
+
+  <link th:href="@{/plugins/toastr/css/toastr.min.css}" rel="stylesheet" content="text/css">
+
+  <!-- Custom Stylesheet -->
+  <link th:href="@{/css/style.css}" rel="stylesheet">
+
+  <style>
+    .button-logout{
+      background: transparent;
+      border: none;
+      color: #76838f;
+      transition: all 0.4s ease-in-out;
+    }
+    .button-logout:hover{
+      color: #2e28f6;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .button-logout:focus{
+      outline: none;
+    }
+  </style>
+</head>
+<body>
+
+<div class="nav-header" th:fragment="nav_header">
+  <div class="brand-logo">
+    <a th:href="@{/home}">
+      <b class="logo-abbr"><img th:src="@{/images/logo.png}" alt=""> </b>
+      <span class="logo-compact"><img th:src="@{/images/logo-compact.png}" alt=""></span>
+      <span class="brand-title">
+                        <img th:src="@{/images/logo-text.png}" alt="">
+                    </span>
+    </a>
+  </div>
+</div>
+
+
+<div class="header" th:fragment="header">
+  <div class="header-content clearfix">
+
+    <div class="nav-control">
+      <div class="hamburger">
+        <span class="toggle-icon"><i class="fa fa-bars" aria-hidden="true"></i></span>
+      </div>
+    </div>
+    <div class="header-left">
+      <div class="input-group icons">
+        <div class="input-group-prepend">
+          <span class="input-group-text bg-transparent border-0 pr-2 pr-sm-3" id="basic-addon1"><i class="fa fa-search" aria-hidden="true"></i></span>
+        </div>
+        <input type="search" class="form-control" placeholder="Search Dashboard" aria-label="Search Dashboard">
+        <div class="drop-down animated flipInX d-md-none">
+          <form action="#">
+            <input type="text" class="form-control" placeholder="Search">
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <ul class="clearfix">
+
+        <li class="icons dropdown">
+          <div class="user-img c-pointer position-relative"   data-toggle="dropdown">
+<!--            <span class="activity active"></span>-->
+            <span sec:authorize="isAuthenticated()">Xin chào, <span sec:authentication="principal.username"></span> <i class="fa fa-angle-down f-s-14" aria-hidden="true"></i></span>
+<!--            <img th:src="@{/images/user/form-user.png}" height="40" width="40" alt="">-->
+          </div>
+          <div class="drop-down dropdown-profile animated fadeIn dropdown-menu">
+            <div class="dropdown-content-body">
+              <ul>
+                <li sec:authorize="hasRole('ROLE_MANAGER')">
+                  <a th:href="@{/user/profile}"><i class="icon-user"></i> <span>Thông tin</span></a>
+                </li>
+                <li sec:authorize="!hasRole('ROLE_ADMIN') and !hasRole('ROLE_MANAGER') and hasRole('ROLE_USER')">
+                  <a th:href="@{/user/profileStudent}"><i class="icon-user"></i> <span>Thông tin</span></a>
+                </li>
+                <li>
+                  <a th:href="@{/user/change-password}"><i class="icon-envelope-open"></i> <span>Đổi mật khẩu</span> </a>
+                </li>
+                <hr class="my-2">
+                <li>
+                  <form method="post" th:action="@{/logout}">
+                    <button type="submit" class="button-logout">
+                      <i class="icon-key" ></i> <span>Logout</span></button>
+                  </form>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+
+<div class="nk-sidebar" th:fragment="nk_sidebar">
+  <div class="nk-nav-scroll">
+    <ul class="metismenu" id="menu">
+      <li class="nav-label">Bảng điều khiển</li>
+      <li>
+        <a th:href="@{/home}" aria-expanded="false">
+          <i class="fa fa-home menu-icon"></i><span class="nav-text">Trang chủ</span>
+        </a>
+      </li>
+
+      <li sec:authorize="hasRole('ROLE_ADMIN') and hasRole('ROLE_MANAGER') and hasRole('ROLE_USER')">
+        <a class="has-arrow" href="javascript:void()" aria-expanded="false">
+          <i class="fa fa-address-book  menu-icon"></i> <span class="nav-text">Quản lý tài khoản</span>
+        </a>
+        <ul aria-expanded="false">
+          <li><a th:href="@{/account/admin}">Tài khoản admin</a></li>
+          <li><a th:href="@{/account/teacher}">Tài khoản giáo viên</a></li>
+          <li><a th:href="@{/account/student}">Tài khoản học sinh</a></li>
+
+        </ul>
+      </li>
+
+      <li sec:authorize="hasRole('ROLE_ADMIN') and hasRole('ROLE_MANAGER') and hasRole('ROLE_USER')">
+        <a th:href="@{/manage/teacher}" aria-expanded="false">
+          <i class="fa fa-user-circle menu-icon"></i><span class="nav-text">Quản lý nhân viên</span>
+        </a>
+      </li>
+      <li sec:authorize="hasRole('ROLE_ADMIN') and hasRole('ROLE_MANAGER') and hasRole('ROLE_USER')">
+        <a th:href="@{/manage/student}" aria-expanded="false">
+          <i class="fa fa-users menu-icon"></i><span class="nav-text">Quản lý học sinh</span>
+        </a>
+      </li>
+      <li sec:authorize="hasRole('ROLE_ADMIN') and hasRole('ROLE_MANAGER') and hasRole('ROLE_USER')">
+        <a th:href="@{/manage/class}" aria-expanded="false">
+          <i class="fa fa-glass menu-icon"></i><span class="nav-text">Quản lý lớp học</span>
+        </a>
+      </li>
+      <li sec:authorize="hasRole('ROLE_ADMIN') and hasRole('ROLE_MANAGER') and hasRole('ROLE_USER')">
+        <a th:href="@{/manage/subject}" aria-expanded="false">
+          <i class="fa fa-window-restore menu-icon"></i><span class="nav-text">Quản lý môn học</span>
+        </a>
+      </li>
+      <li sec:authorize="hasRole('ROLE_ADMIN') and hasRole('ROLE_MANAGER') and hasRole('ROLE_USER')">
+        <a th:href="@{/manage/score}" aria-expanded="false">
+          <i class="fa fa-star" aria-hidden="true"></i><span class="nav-text">Quản lý điểm</span>
+        </a>
+      </li>
+      <li sec:authorize="hasRole('ROLE_ADMIN') and hasRole('ROLE_MANAGER') and hasRole('ROLE_USER')">
+        <a th:href="@{/manage/assign}" aria-expanded="false">
+          <i class="fa fa-handshake-o" aria-hidden="true"></i><span class="nav-text">Phân công giảng dạy</span>
+        </a>
+      </li>
+
+      <li sec:authorize="!hasRole('ROLE_ADMIN') and hasRole('ROLE_MANAGER') and hasRole('ROLE_USER')">
+        <a class="has-arrow" href="javascript:void()" aria-expanded="false">
+          <i class="fa fa-address-book  menu-icon"></i> <span class="nav-text">Quản lý lớp học</span>
+        </a>
+        <ul aria-expanded="false">
+          <li><a th:href="@{/teacher/homeroom}">Lớp chủ nhiệm</a></li>
+          <li><a th:href="@{/teacher/study}">Lớp dạy học</a></li>
+        </ul>
+      </li>
+
+      <li sec:authorize="!hasRole('ROLE_ADMIN') and hasRole('ROLE_MANAGER') and hasRole('ROLE_USER')">
+        <a th:href="@{/teacher/score}" aria-expanded="false">
+          <i class="fa fa-star-half" aria-hidden="true"></i><span class="nav-text">Cập nhập điểm</span>
+        </a>
+      </li>
+
+      <li sec:authorize="!hasRole('ROLE_ADMIN') and !hasRole('ROLE_MANAGER') and hasRole('ROLE_USER')">
+        <a th:href="@{/student/subject}" aria-expanded="false">
+          <i class="fa fa-book" aria-hidden="true"></i><span class="nav-text">Xem điểm môn học</span>
+        </a>
+      </li>
+
+    </ul>
+  </div>
+</div>
+
+</body>
+</html>

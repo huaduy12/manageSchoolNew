@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <title>Giáo viên chủ nhiệm</title>
+  <th:block th:replace="fragment/header :: html_head"></th:block>
+
+
+  <style>
+    .dropdown-item{
+      width: -webkit-fill-available;
+    }
+  </style>
+</head>
+
+<body>
+
+<!--*******************
+    Preloader start
+********************-->
+<div id="preloader">
+  <div class="loader">
+    <svg class="circular" viewBox="25 25 50 50">
+      <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="3" stroke-miterlimit="10" />
+    </svg>
+  </div>
+</div>
+<!--*******************
+    Preloader end
+********************-->
+
+
+<!--**********************************
+    Main wrapper start
+***********************************-->
+<div id="main-wrapper">
+
+  <!--**********************************
+      Nav header start
+  ***********************************-->
+  <div th:replace="fragment/header :: nav_header">
+  </div>
+  <!--**********************************
+      Nav header end
+  ***********************************-->
+
+  <!--**********************************
+      Header start
+  ***********************************-->
+  <div th:replace="fragment/header :: header">
+  </div>
+  <!--**********************************
+      Header end ti-comment-alt
+  ***********************************-->
+
+  <!--**********************************
+      Sidebar start
+  ***********************************-->
+  <div th:replace="fragment/header :: nk_sidebar"></div>
+  <!--**********************************
+      Sidebar end
+  ***********************************-->
+
+  <!--**********************************
+      Content body start
+  ***********************************-->
+  <div class="content-body">
+
+    <div class="row page-titles mx-0">
+      <div class="col p-md-0">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="javascript:void(0)">Dashboard</a></li>
+          <li class="breadcrumb-item active"><a href="javascript:void(0)">Home</a></li>
+        </ol>
+      </div>
+    </div>
+    <!-- row -->
+
+    <div class="container-fluid">
+      <div class="row justify-content-center">
+
+        <div class="col-lg-12">
+
+          <div class="card">
+            <div class="card-body">
+              <h3 class="text-center mb-5">Giáo viên chủ nhiệm</h3>
+
+              <div class="form-validation">
+                <form class="form-valide" method="post" th:action="@{/manage/class/saveTeacherHomeroom}"  th:object="${teacherClass}">
+
+                  <input type="hidden" th:field="*{id}">
+                  <input type="hidden" th:if="${idClass}" name="idClass" th:value="${idClass}" />
+
+                  <div class="form-group row">
+                    <label class="col-lg-4 col-form-label" for="year">Năm học chủ nhiệm <span class="text-danger">*</span>
+                    </label>
+                    <div class="col-lg-6">
+                      <select class="form-control" id="year" th:field="*{school_year}">
+                        <option label="Vui lòng chọn" value="" > </option>
+                        <option th:each="year : ${school_years}" th:selected="year" th:value="${year.id}" th:text="${year.name}"></option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="form-group row">
+                    <label class="col-lg-4 col-form-label" for="semester">Kỳ học chủ nhiệm <span class="text-danger">*</span>
+                    </label>
+                    <div class="col-lg-6">
+                      <select class="form-control" id="semester" th:field="*{semester}">
+                        <option label="Vui lòng chọn" value="" > </option>
+                        <option th:each="semester : ${semesters}" th:selected="semester" th:value="${semester.id}" th:text="${semester.name}"></option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-group row mb-5">
+                    <label class="col-lg-4 col-form-label" for="teacherHomeroom">Giáo viên chủ nhiệm <span class="text-danger">*</span>
+                    </label>
+                    <div class="col-lg-6">
+                      <select class="form-control" id="teacherHomeroom" th:field="*{teacher}">
+                        <option label="Vui lòng chọn" value="" > </option>
+                        <option th:each="teacher : ${teacherList}" th:selected="teacher" th:value="${teacher.id}" th:text="${teacher.fullName}"></option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <div class="col-lg-8 ml-auto">
+                      <button type="button" class="btn btn-warning" onclick="window.location.href='/manage/class'">Đóng</button>
+                      <button type="submit" class="btn btn-primary">Lưu thông tin</button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- #/ container -->
+  </div>
+  <!--**********************************
+      Content body end
+  ***********************************-->
+
+
+  <!--**********************************
+      Footer start
+  ***********************************-->
+  <div th:replace="fragment/footer :: footer">
+  </div>
+  <!--**********************************
+      Footer end
+  ***********************************-->
+</div>
+<!--**********************************
+    Main wrapper end
+***********************************-->
+
+<!--**********************************
+    Scripts
+***********************************-->
+
+<script th:src="@{/plugins/toastr/js/toastr.min.js}"></script>
+<script th:src="@{/plugins/toastr/js/toastr.init.js}"></script>
+
+
+<script th:inline="javascript" th:if="${changeSuccess != null}">
+  toastr.success("Thay đổi thành công","Thành công", {
+    timeOut: 5e3,
+    closeButton: !0,
+    debug: !1,
+    newestOnTop: !0,
+    progressBar: !0,
+    positionClass: "toast-top-right",
+    preventDuplicates: !0,
+    onclick: null,
+    showDuration: "300",
+    hideDuration: "1000",
+    extendedTimeOut: "1000",
+    showEasing: "swing",
+    hideEasing: "linear",
+    showMethod: "fadeIn",
+    hideMethod: "fadeOut",
+    tapToDismiss: !1
+  });
+</script>
+
+<script th:inline="javascript" th:if="${changeFail != null}">
+  toastr.error( "Thay đổi thất bại","Thất bại", {
+    timeOut: 5e3,
+    closeButton: !0,
+    debug: !1,
+    newestOnTop: !0,
+    progressBar: !0,
+    positionClass: "toast-top-right",
+    preventDuplicates: !0,
+    onclick: null,
+    showDuration: "300",
+    hideDuration: "1000",
+    extendedTimeOut: "1000",
+    showEasing: "swing",
+    hideEasing: "linear",
+    showMethod: "fadeIn",
+    hideMethod: "fadeOut",
+    tapToDismiss: !1
+  });
+</script>
+
+<!--**********************************
+    Scripts
+***********************************-->
+<script th:src="@{/plugins/common/common.min.js}"></script>
+<script th:src="@{/js/custom.min.js}"></script>
+<script th:src="@{/js/settings.js}"></script>
+<script th:src="@{/js/gleek.js}"></script>
+<script th:src="@{/js/styleSwitcher.js}"></script>
+
+
+<script th:src="@{/plugins/validation/jquery.validate.min.js}"></script>
+<script th:src="@{/plugins/validation/jquery.validate-init.js}"></script>
+
+</body>
+
+</html>

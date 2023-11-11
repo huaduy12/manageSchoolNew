@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <title>Điểm của học sinh</title>
+  <th:block th:replace="fragment/header :: html_head"></th:block>
+
+  <style>
+    td input{
+      width: 60%;
+      text-align: center;
+    }
+    td{
+      text-align: center;
+    }
+    .border-red{
+      border: 2px solid red;
+    }
+  </style>
+</head>
+
+<body>
+
+<!--*******************
+    Preloader start
+********************-->
+<div id="preloader">
+  <div class="loader">
+    <svg class="circular" viewBox="25 25 50 50">
+      <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="3" stroke-miterlimit="10" />
+    </svg>
+  </div>
+</div>
+<!--*******************
+    Preloader end
+********************-->
+
+
+<!--**********************************
+    Main wrapper start
+***********************************-->
+<div id="main-wrapper">
+
+  <!--**********************************
+      Nav header start
+  ***********************************-->
+  <div th:replace="fragment/header :: nav_header">
+  </div>
+  <!--**********************************
+      Nav header end
+  ***********************************-->
+
+  <!--**********************************
+      Header start
+  ***********************************-->
+  <div th:replace="fragment/header :: header">
+  </div>
+  <!--**********************************
+      Header end ti-comment-alt
+  ***********************************-->
+
+  <!--**********************************
+      Sidebar start
+  ***********************************-->
+  <div th:replace="fragment/header :: nk_sidebar"></div>
+  <!--**********************************
+      Sidebar end
+  ***********************************-->
+
+  <!--**********************************
+      Content body start
+  ***********************************-->
+  <div class="content-body">
+
+    <div class="row page-titles mx-0">
+      <div class="col p-md-0">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="javascript:void(0)">Dashboard</a></li>
+          <li class="breadcrumb-item active"><a href="javascript:void(0)">Bảng điểm</a></li>
+        </ol>
+      </div>
+    </div>
+    <!-- row -->
+
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-body">
+              <h4 class="card-title">Danh sách điểm môn học</h4>
+
+              <div class="table-responsive">
+
+                <table class="table table-striped table-bordered zero-configuration">
+
+                  <thead>
+                  <tr>
+                    <th>Năm học</th>
+                    <th>Kỳ học</th>
+                    <th>Môn học</th>
+                    <th>Điểm miệng</th>
+                    <th>Kiểm tra 15p</th>
+                    <th>Điểm 1 tiết</th>
+                    <th>Điểm thi</th>
+                    <th>Điểm trung bình</th>
+
+                  </tr>
+                  </thead>
+                  <tbody>
+
+                  <tr th:each="score : ${scoreDtos}">
+
+                    <td th:text="${score.school_year.name}"></td>
+                    <td th:text="${score.semester.name}"></td>
+                    <td th:text="${score.subject.name}" d></td>
+                    <td th:text="${score.oval_score != null ? score.oval_score : ''}"></td>
+                    <td th:text="${score.score_15 != null ? score.score_15 : ''}"></td>
+                    <td th:text="${score.score_1_period != null ? score.score_1_period : ''}"></td>
+                    <td th:text="${score.test_score != null ? score.test_score : ''}"></td>
+                    <td th:text="${score.medium_score != null ? score.medium_score : ''}"></td>
+
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- #/ container -->
+  </div>
+  <!--**********************************
+      Content body end
+  ***********************************-->
+
+
+  <!--**********************************
+      Footer start
+  ***********************************-->
+  <div th:replace="fragment/footer :: footer">
+  </div>
+  <!--**********************************
+      Footer end
+  ***********************************-->
+</div>
+<!--**********************************
+    Main wrapper end
+***********************************-->
+
+<!-- Modal -->
+
+
+
+
+
+
+<!--**********************************
+    Scripts
+***********************************-->
+<script th:src="@{/plugins/common/common.min.js}"></script>
+<script th:src="@{/js/custom.min.js}"></script>
+<script th:src="@{/js/settings.js}"></script>
+<script th:src="@{/js/gleek.js}"></script>
+<script th:src="@{/js/styleSwitcher.js}"></script>
+
+<script th:src="@{/plugins/tables/js/jquery.dataTables.min.js}"></script>
+<script th:src="@{/plugins/tables/js/datatable/dataTables.bootstrap4.min.js}"></script>
+<script th:src="@{/plugins/tables/js/datatable-init/datatable-basic.min.js}"></script>
+
+</body>
+
+</html>

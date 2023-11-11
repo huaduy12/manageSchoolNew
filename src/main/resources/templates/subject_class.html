@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+
+<head>
+  <title>Quản lý môn học</title>
+  <th:block th:replace="fragment/header :: html_head"></th:block>
+
+</head>
+
+<body>
+
+<!--*******************
+    Preloader start
+********************-->
+<div id="preloader">
+  <div class="loader">
+    <svg class="circular" viewBox="25 25 50 50">
+      <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="3" stroke-miterlimit="10" />
+    </svg>
+  </div>
+</div>
+<!--*******************
+    Preloader end
+********************-->
+
+
+<!--**********************************
+    Main wrapper start
+***********************************-->
+<div id="main-wrapper">
+
+  <!--**********************************
+      Nav header start
+  ***********************************-->
+  <div th:replace="fragment/header :: nav_header">
+  </div>
+  <!--**********************************
+      Nav header end
+  ***********************************-->
+
+  <!--**********************************
+      Header start
+  ***********************************-->
+  <div th:replace="fragment/header :: header">
+  </div>
+  <!--**********************************
+      Header end ti-comment-alt
+  ***********************************-->
+
+  <!--**********************************
+      Sidebar start
+  ***********************************-->
+  <div th:replace="fragment/header :: nk_sidebar"></div>
+  <!--**********************************
+      Sidebar end
+  ***********************************-->
+
+  <!--**********************************
+      Content body start
+  ***********************************-->
+  <div class="content-body">
+
+    <div class="row page-titles mx-0">
+      <div class="col p-md-0">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="javascript:void(0)">Dashboard</a></li>
+          <li class="breadcrumb-item active"><a href="javascript:void(0)">Môn học</a></li>
+        </ol>
+      </div>
+    </div>
+    <!-- row -->
+
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-body">
+              <h3 class="card-title" th:text="'Quản lý môn học lớp '+ ${nameClass.name}"></h3>
+              <input type="hidden" id = "idClass" th:value="${nameClass.id}"/>
+              <button sec:authorize="hasRole('ROLE_ADMIN') and hasRole('ROLE_MANAGER') and hasRole('ROLE_USER')"
+                      type="button" class="btn btn-info ml-4 add-button" data-toggle="modal" data-target="#modalAddEdit">
+                <i class="fa fa-plus" aria-hidden="true"></i> Thêm môn học cho lớp</button>
+              <div class="table-responsive">
+                <table class="table table-striped table-bordered zero-configuration">
+                  <thead>
+                  <tr>
+                    <th>Năm học</th>
+                    <th>Kỳ học</th>
+                    <th>Môn học</th>
+                    <th>GV dạy</th>
+                    <th sec:authorize="hasRole('ROLE_ADMIN') and hasRole('ROLE_MANAGER') and hasRole('ROLE_USER')">Chức năng</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr th:each="teacher_class : ${teacher_classes}">
+                    <td th:text="${teacher_class.school_year} ? ${teacher_class.school_year.name} : ''"></td>
+                    <td th:text="${teacher_class.semester} ? ${teacher_class.semester.name} : ''"></td>
+                    <td th:text="${teacher_class.subject} ? ${teacher_class.subject.name} : ''"></td>
+                    <td th:text="${teacher_class.teacher} ? ${teacher_class.teacher.fullName} : ''"></td>
+                    <td sec:authorize="hasRole('ROLE_ADMIN') and hasRole('ROLE_MANAGER') and hasRole('ROLE_USER')"
+                            th:data-id="${teacher_class.id}" th:data-year="${teacher_class.school_year.id}"
+                        th:data-semester="${teacher_class.semester.id}" th:data-subject="${teacher_class.subject.id}"
+                        th:data-teacher="${teacher_class.teacher.id}">
+                      <button type="button" class="btn btn-info edit-button" data-toggle="modal" data-target="#modalAddEdit">Sửa</button>
+                      <button type="button" class="btn btn-danger delete-button" data-toggle="modal" data-target="#modalDelete">Xóa</button>
+                    </td>
+
+                  </tr>
+
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- #/ container -->
+  </div>
+  <!--**********************************
+      Content body end
+  ***********************************-->
+
+
+  <!--**********************************
+      Footer start
+  ***********************************-->
+  <div th:replace="fragment/footer :: footer">
+  </div>
+  <!--**********************************
+      Footer end
+  ***********************************-->
+</div>
+<!--**********************************
+    Main wrapper end
+***********************************-->
+
+<!-- Modal -->
+<div class="modal fade" id="modalAddEdit" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Môn học của lớp</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form method="post" th:object="${formSubjectClass}" th:action="@{/manage/class/saveSubject}">
+        <input type="hidden"  id="id" th:field="*{id}">
+        <input type="hidden"  name="form" value="form">
+        <input type="hidden"  id = "classRoom" th:field="*{classroomId}">
+
+        <div class="modal-body" id ="modalError" th:data-has-errors="${#fields.hasErrors()}">
+
+          <div class="form-group">
+            <label for="year">Năm học</label>
+            <select class="form-control" id="year" th:field="*{school_yearId}">
+              <option label="Vui lòng chọn" value="" > </option>
+              <option th:each="year : ${school_years}" th:selected="${year.id}" th:value="${year.id}" th:text="${year.name}"></option>
+            </select>
+            <p class="text-danger" th:if="${#fields.hasErrors('school_yearId')}" th:errors="*{school_yearId}"></p>
+          </div>
+
+          <div class="form-group">
+            <label for="semester">Kỳ học</label>
+            <select class="form-control" id="semester" th:field="*{semesterId}">
+              <option label="Vui lòng chọn" value="" > </option>
+              <option th:each="semester : ${semesters}" th:selected="${semester.id}" th:value="${semester.id}" th:text="${semester.name}"></option>
+            </select>
+            <p class="text-danger" th:if="${#fields.hasErrors('semesterId')}" th:errors="*{semesterId}"></p>
+          </div>
+
+          <div class="form-group">
+            <label for="subject">Môn học</label>
+            <select class="form-control" id="subject" th:field="*{subjectId}">
+              <option label="Vui lòng chọn" value="" > </option>
+              <option th:each="subject : ${subjects}"  th:selected="${subject.id}" th:value="${subject.id}" th:text="${subject.id}+ ' - ' +${subject.name}"></option>
+            </select>
+            <p class="text-danger" th:if="${#fields.hasErrors('subjectId')}" th:errors="*{subjectId}"></p>
+          </div>
+
+          <div class="form-group">
+            <label for="teacher">Giáo viên dạy</label>
+            <select class="form-control" id=teacher th:field="*{teacherId}">
+              <option label="Vui lòng chọn" value="" > </option>
+              <option th:each="teacher : ${teacherList}" th:selected="${teacher.id}" th:value="${teacher.id}" th:text="${teacher.id}+' - '+ ${teacher.fullName}"></option>
+            </select>
+            <p class="text-danger" th:if="${#fields.hasErrors('teacherId')}" th:errors="*{teacherId}"></p>
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          <button th:if="${#fields.hasAnyErrors()}" type="button" class="btn btn-secondary" onclick="window.location.href='/manage/subject'">Đóng</button>
+          <button th:unless="${#fields.hasAnyErrors()}" type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+          <button type="submit" class="btn btn-primary">Lưu</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="modalDelete">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Xác nhận</h5>
+        <button type="button" class="close" data-dismiss="modal"><span>&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">Bạn có chắc chắn muốn xóa môn học khỏi lớp này không <span class="text-danger">(Lưu ý sau khi xóa thì không thể khôi phục)</span> ?</div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Không</button>
+        <form method="post" th:action="@{/manage/class/deleteSubject}">
+          <input type="hidden" id="id-delete" name="idDelete"/>
+          <input type="hidden" id="id-classroom" name="idClassroom"/>
+          <button type="submit" class="btn btn-primary">Đồng ý</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<script th:inline="javascript" th:if="${formError}">
+  $(document).ready(function() {
+    $("#modalAddEdit").modal("show");
+  });
+</script>
+
+<script th:inline="javascript">
+  $(document).ready(function () {
+    // Lắng nghe sự kiện click vào modal
+    $('#modalAddEdit').on('click', function (e) {
+      var hasErrors = $('#modalError').data("has-errors");
+      var idClass = $("#idClass").val();
+      // Kiểm tra xem sự kiện click có diễn ra trong phần nội dung modal hay không
+      if (!$(e.target).closest('.modal-content').length) {
+        if(hasErrors){
+          // Nếu không, chuyển hướng đến trang account/admin
+          window.location.href = '/manage/class/subject?id=' + idClass;
+        }
+
+      }
+    });
+  });
+</script>
+
+<script>
+  $(document).ready(function (){
+
+    $(".add-button").click(function (){
+      var classRoomId = $("#idClass").val();
+      $("#year").val('');
+      $("#semester").val('');
+      $("#subject").val('');
+      $("#teacher").val('');
+      $("#classRoom").val(classRoomId);
+    });
+
+    $(".edit-button").click(function (){
+      var id = $(this).parent().data("id")
+      var year = $(this).parent().data("year");
+      var semester = $(this).parent().data("semester");
+      var subject = $(this).parent().data("subject");
+      var teacher = $(this).parent().data("teacher");
+      var classRoomId = $("#idClass").val();
+      // Gán giá trị cho các trường input trong modal
+      $("#id").val(id);
+      $("#year").val(year);
+      $("#semester").val(semester);
+      $("#subject").val(subject);
+      $("#teacher").val(teacher);
+      $("#classRoom").val(classRoomId);
+    });
+
+
+    $(".delete-button").click(function (){
+      let id = $(this).parent().data("id");
+      var classRoomId = $("#idClass").val();
+      $("#id-delete").val(id);
+      $("#id-classroom").val(classRoomId);
+    })
+
+  });
+
+</script>
+
+
+<script th:src="@{/plugins/toastr/js/toastr.min.js}"></script>
+<script th:src="@{/plugins/toastr/js/toastr.init.js}"></script>
+
+
+<script th:inline="javascript" th:if="${changeSuccess != null}">
+  toastr.success("Thay đổi thành công", "Thành công", {
+    timeOut: 5e3,
+    closeButton: !0,
+    debug: !1,
+    newestOnTop: !0,
+    progressBar: !0,
+    positionClass: "toast-top-right",
+    preventDuplicates: !0,
+    onclick: null,
+    showDuration: "300",
+    hideDuration: "1000",
+    extendedTimeOut: "1000",
+    showEasing: "swing",
+    hideEasing: "linear",
+    showMethod: "fadeIn",
+    hideMethod: "fadeOut",
+    tapToDismiss: !1
+  });
+</script>
+
+<script th:inline="javascript" th:if="${changeFail != null}">
+  toastr.error("Thay đổi thất bại", "Thất bại", {
+    timeOut: 5e3,
+    closeButton: !0,
+    debug: !1,
+    newestOnTop: !0,
+    progressBar: !0,
+    positionClass: "toast-top-right",
+    preventDuplicates: !0,
+    onclick: null,
+    showDuration: "300",
+    hideDuration: "1000",
+    extendedTimeOut: "1000",
+    showEasing: "swing",
+    hideEasing: "linear",
+    showMethod: "fadeIn",
+    hideMethod: "fadeOut",
+    tapToDismiss: !1
+  });
+</script>
+
+
+<script th:inline="javascript" th:if="${changeDeleteFail != null}">
+  toastr.error("Xóa thất bại do môn học đã được nhập điểm", "Thất bại", {
+    timeOut: 5e3,
+    closeButton: !0,
+    debug: !1,
+    newestOnTop: !0,
+    progressBar: !0,
+    positionClass: "toast-top-right",
+    preventDuplicates: !0,
+    onclick: null,
+    showDuration: "300",
+    hideDuration: "1000",
+    extendedTimeOut: "1000",
+    showEasing: "swing",
+    hideEasing: "linear",
+    showMethod: "fadeIn",
+    hideMethod: "fadeOut",
+    tapToDismiss: !1
+  });
+
+
+</script>
+
+<!--**********************************
+    Scripts
+***********************************-->
+<script th:src="@{/plugins/common/common.min.js}"></script>
+<script th:src="@{/js/custom.min.js}"></script>
+<script th:src="@{/js/settings.js}"></script>
+<script th:src="@{/js/gleek.js}"></script>
+<script th:src="@{/js/styleSwitcher.js}"></script>
+
+<script th:src="@{/plugins/tables/js/jquery.dataTables.min.js}"></script>
+<script th:src="@{/plugins/tables/js/datatable/dataTables.bootstrap4.min.js}"></script>
+<script th:src="@{/plugins/tables/js/datatable-init/datatable-basic.min.js}"></script>
+
+</body>
+
+</html>

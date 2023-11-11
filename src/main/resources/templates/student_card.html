@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Thẻ học sinh</title>
+    <th:block th:replace="fragment/header :: html_head"></th:block>
+
+    <style>
+        body{
+            background-color: silver;
+        }
+        #div1{
+            margin: 0px;
+            padding: 0px;
+            border: 2px solid black;
+            width: 100%;
+            height: 400px;
+            margin-top: 60px;
+            border-radius: 5px;
+            background-color: white;
+        }
+        #p1{
+            background-color: rgb(8, 128, 240);
+            margin:0px;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+            font-size: 30px;
+            padding: 10px;
+
+        }
+        .image_avatar{
+            border: 1px solid black;
+            width: 170px;
+            height: 187px;
+            margin: 0px;
+            padding: 0px;
+            margin-top: 20px;
+            margin-left: 20px;
+            float: left;
+        }
+        #div2{
+            float: left;
+            margin-left: 20px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        .p2{
+            margin-top: 0px;
+            margin-bottom: 5px;
+        }
+        .label1{
+            font-size: 23px;
+            font-weight: bold;
+            opacity: 0.7;
+        }
+        .label2{
+            font-size: 25px;
+            font-weight: bold;
+            margin-left: 15px;
+        }
+        h1{
+            margin-left: 10px;
+            margin-bottom: 0px;
+        }
+        h3{
+            margin-top: 0px;
+            float: left;
+            margin-left: 10px;
+        }
+
+        @media (max-width: 768px) {
+            #div1 {
+                max-width: 100%;
+                height: 100% !important;
+                padding: 10px;
+            }
+            .image_avatar{
+                margin-top: 10px;
+                width: 120px;
+                height: 120px;
+            }
+
+            .margin-top{
+                margin-top: 60px;
+            }
+            .label2{
+                font-size: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!--*******************
+        Preloader start
+    ********************-->
+    <div id="preloader">
+        <div class="loader">
+            <svg class="circular" viewBox="25 25 50 50">
+                <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="3" stroke-miterlimit="10" />
+            </svg>
+        </div>
+    </div>
+    <!--*******************
+        Preloader end
+    ********************-->
+
+    
+    <!--**********************************
+        Main wrapper start
+    ***********************************-->
+    <div id="main-wrapper">
+
+        <!--**********************************
+            Nav header start
+        ***********************************-->
+        <div th:replace="fragment/header :: nav_header">
+        </div>
+        <!--**********************************
+            Nav header end
+        ***********************************-->
+
+        <!--**********************************
+            Header start
+        ***********************************-->
+        <div th:replace="fragment/header :: header">
+        </div>
+        <!--**********************************
+            Header end ti-comment-alt
+        ***********************************-->
+
+        <!--**********************************
+            Sidebar start
+        ***********************************-->
+        <div th:replace="fragment/header :: nk_sidebar"></div>
+        <!--**********************************
+            Sidebar end
+        ***********************************-->
+
+        <!--**********************************
+            Content body start
+        ***********************************-->
+        <div class="content-body">
+
+            <div class="row page-titles mx-0">
+                <div class="col p-md-0">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="javascript:void(0)">Dashboard</a></li>
+                        <li class="breadcrumb-item active"><a href="javascript:void(0)">Thẻ học sinh</a></li>
+                    </ol>
+                </div>
+            </div>
+            <!-- row -->
+
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="card-title">Thông tin thẻ học sinh</h4>
+                                 <p class="mr-2">Học sinh : <span th:text="${studentDto} ? ${studentDto.fullName} : '' "></span></p>
+                                
+                                 <div class="row">
+                                    <div class="col-lg-6">
+                                        <div id="div1">
+                                            <p id="p1">Trường Trung học phổ thông Triệu Sơn 5</p>
+                                            <img th:if="${studentCard}" th:src="@{'/images/'+${studentCard.getPhoto()} }" alt="" class="image_avatar">
+                                            <div id="div2">
+                                                <p class="p2" ><label class="label1">Họ và tên: </label> <label class="label2" th:text="${studentDto} ? ${studentDto.fullName} : '' "></label></p>
+                                                <p class="p2" ><label class="label1">Niên khóa: </label> <label class="label2" th:text="${studentDto} ? ${studentDto.academy_year} : '' "></label></p>
+                                                <p class="p2" ><label class="label1">Lớp học: </label> <label class="label2" th:text="${studentDto} ? ${studentDto.getClassroom().name} : '' "></label></p>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="col-lg-6">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h4 class="card-title">File ảnh</h4>
+                                                <div class="basic-form">
+                                                    <form action="#" th:action="@{/manage/student/imageUpload}"
+                                                          enctype="multipart/form-data" method="post" th:object="${studentCard}">
+
+                                                        <input type="hidden" th:field="*{student}">
+                                                        <input type="hidden" th:field="*{id}">
+
+                                                        <div class="basic-form">
+                                                            <div class="form-group">
+                                                                <input type="file"class="form-control-file" name="img">
+                                                            </div>
+                                                            <div class="input-group mt-3">
+                                                                <button type="submit" class="btn mb-1 btn-rounded btn-success"><span class="btn-icon-left"><i class="fa fa-upload color-success"></i> </span>Tải ảnh</button>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                 </div>
+                             
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- #/ container -->
+        </div>
+        <!--**********************************
+            Content body end
+        ***********************************-->
+        
+        
+        <!--**********************************
+            Footer start
+        ***********************************-->
+        <div th:replace="fragment/footer :: footer">
+        </div>
+        <!--**********************************
+            Footer end
+        ***********************************-->
+    </div>
+    <!--**********************************
+        Main wrapper end
+    ***********************************-->
+
+
+
+    <!--**********************************
+        Scripts
+    ***********************************-->
+    <script th:src="@{/plugins/common/common.min.js}"></script>
+    <script th:src="@{/js/custom.min.js}"></script>
+    <script th:src="@{/js/settings.js}"></script>
+    <script th:src="@{/js/gleek.js}"></script>
+    <script th:src="@{/js/styleSwitcher.js}"></script>
+
+    <script th:src="@{/plugins/tables/js/jquery.dataTables.min.js}"></script>
+    <script th:src="@{/plugins/tables/js/datatable/dataTables.bootstrap4.min.js}"></script>
+    <script th:src="@{/plugins/tables/js/datatable-init/datatable-basic.min.js}"></script>
+
+</body>
+
+</html>
