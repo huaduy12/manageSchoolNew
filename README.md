@@ -1,5 +1,10 @@
 # Website quản lý trường học
-
+- Mục đích xây dựng: Hiểu sâu hơn về cách hoạt động cơ bản của Spring framework và các ngôn ngữ liên quan, thư viện liên quan
+- Công nghệ sử dụng: 
+    - Back-end: Java, Spring Framework, Spring Data JPA
+    - Front-end: Html/Css, Bootstrap 4, Thymeleaf, Javascript, Jquery
+    - Database: MySql
+    - Security: Spring Security
 - Giao diện login khi mới vào web thì sẽ được security đẩy ra
 <img src="./images-git/login.png">
 - Giao diện và chức năng với admin
