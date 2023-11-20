@@ -22,8 +22,4 @@ public class Role implements Serializable {
 
     @Column(name = "name",length = 45,nullable = false)
     private String name;
-
-
-
-
 }

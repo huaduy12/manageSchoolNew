@@ -22,4 +22,6 @@ public interface TeacherClassService {
     public Boolean saveSubjectClass(FormSubjectClass formSubjectClass);
     public Boolean deleteSubjectClass(int id);
 
+
+
 }

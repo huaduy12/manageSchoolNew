@@ -1,5 +1,6 @@
 package com.example.school.controller;
 
+import com.example.school.configuration.Pagination;
 import com.example.school.dto.ClassroomDto;
 import com.example.school.dto.ScoreDto;
 import com.example.school.dto.SubjectDto;
@@ -11,6 +12,7 @@ import com.example.school.service.SubjectService;
 import com.example.school.service.TeacherClassService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -37,13 +39,7 @@ public class ManageScore {
 
     @GetMapping()
     public String homeClass(Model model){
-        List<ClassroomDto> classroomDtos = classroomService.getClassRoom();
-        model.addAttribute("classroomDtos",classroomDtos);
-        FormClassroom formClassroom = new FormClassroom();
-        formClassroom.setId(0);
-        model.addAttribute("formClassroom",formClassroom);
-        model.addAttribute("showScore",true);
-        return "/manage_class";
+      return findPaginatedScoreClass(1,model);
     }
 
     @GetMapping("/idClass")
@@ -126,6 +122,25 @@ public class ManageScore {
             return "redirect:/manage/score/subject_score?id=" + teacher_classId;
         }
     }
+    @GetMapping("/page/{pageNo}")
+    public String findPaginatedScoreClass(@PathVariable(value = "pageNo") int pageNo,Model model
 
+    ){
+        if(pageNo <= 0) return "redirect:/manage/score";
+        int pageSize = Pagination.pageSize;
+        Page<ClassroomDto> classroomDtos = classroomService.findPaginated(pageNo-1,pageSize);
+
+        model.addAttribute("pageNo",pageNo);
+        model.addAttribute("pageSize",pageSize);
+        model.addAttribute("classroomDtos",classroomDtos);
+
+        // thông tin các lớp đang còn học để phục vụ cho form add, edit
+
+           FormClassroom formClassroom = new FormClassroom();
+            formClassroom.setId(0);
+            model.addAttribute("formClassroom",formClassroom);
+        model.addAttribute("showScore",true);
+        return "manage_class";
+    }
 
 }

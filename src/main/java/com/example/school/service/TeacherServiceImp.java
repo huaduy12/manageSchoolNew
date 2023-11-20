@@ -1,8 +1,10 @@
 package com.example.school.service;
 
+import com.example.school.dto.StudentDto;
 import com.example.school.dto.TeacherDto;
 import com.example.school.dto.UserDto;
 import com.example.school.entity.RoleTeacher;
+import com.example.school.entity.Student;
 import com.example.school.entity.Teacher;
 import com.example.school.entity.Teacher_class;
 import com.example.school.form.teacher.FormManageTeacher;
@@ -11,6 +13,7 @@ import com.example.school.repository.TeacherRepository;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Type;
@@ -35,7 +38,6 @@ public class TeacherServiceImp implements  TeacherService{
         List<Teacher> teacherList = teacherRepository.findAll();
         // lọc không hiển thị admin ra
         List<Teacher> teacherFilter = new ArrayList<>();
-
         for (Teacher t:teacherList) {
             if(t.getRole() != RoleTeacher.Admin){
                 teacherFilter.add(t);
@@ -158,5 +160,21 @@ public Teacher save(FormManageTeacher formManageTeacher) {
         Teacher teacher = findById(id);
         teacher.setStatus(true);
         teacherRepository.save(teacher);
+    }
+
+    @Override
+    public Page<TeacherDto> findPaginated(int pageNo, int pageSize) {
+
+        Sort sort = Sort.by(Sort.Order.desc("id"));
+        Pageable pageable = PageRequest.of(pageNo,pageSize,sort);
+        Page<Teacher> teachers = teacherRepository.findAllByRoleNot(RoleTeacher.Admin,pageable);
+
+        List<TeacherDto> teacherDtos = null;
+        if(teachers != null){
+            Type listType =  new TypeToken<List<TeacherDto>>() {}.getType ();
+            teacherDtos = modelMapper.map(teachers.getContent(),listType);
+            return new PageImpl<>(teacherDtos,pageable,teachers.getTotalElements());
+        }
+        return null;
     }
 }

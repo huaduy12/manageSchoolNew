@@ -1,5 +1,6 @@
 package com.example.school.service.account;
 
+import com.example.school.dto.TeacherDto;
 import com.example.school.dto.UserDto;
 import com.example.school.entity.Role;
 import com.example.school.entity.User;
@@ -8,10 +9,13 @@ import com.example.school.repository.RoleRepository;
 import com.example.school.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -32,34 +36,29 @@ public class UserAdminServiceImp implements UserAdminService{
     @Autowired
     PasswordEncoder passwordEncoder;
 
-    @Override
-    public List<User> getAllAccountAdmin(){
-        List<User> getAllUser = userRepository.findAll();
-        List<User> users= new ArrayList<>();
-        for (User u:getAllUser) {
-            for (Role role : u.getRoles()) {
-                if (role.getId() == 1){
-                    users.add(u);
-                }
-            }
-        }
-        return users;
-    }
+
 
     @Override
     @Transactional
     public void save(CreatingUserForm creatingUserForm) {
+
+        System.out.println(creatingUserForm);
         List<Role>  role = roleRepository.findAll();
         creatingUserForm.setRoles(role);
         User user = modelMapper.map(creatingUserForm, User.class);
         // lấy từ form về trong trường hợp edit ko có pass, chi có id nên theo id tìm kiêm xong đặt pass
+
         if(creatingUserForm.getId() != 0){
            User userPass = finByIdUser(creatingUserForm.getId());
-           user.setPassword(userPass.getPassword());
+           User userEdit = modelMapper.map(userPass, User.class);
+           userEdit.setUsername(creatingUserForm.getUsername());
+           userRepository.save(userEdit);
+        }else{
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            user.setActive(true);
+            userRepository.save(user);
         }
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setActive(true);
-        userRepository.save(user);
+
     }
 
     @Override
@@ -124,6 +123,23 @@ public class UserAdminServiceImp implements UserAdminService{
             userDto = modelMapper.map(user,UserDto.class);
         }
         return userDto ;
+    }
+
+    @Override
+    public Page<UserDto> findPaginated(int pageNo, int pageSize) {
+        Role role = roleRepository.findById(1);
+
+        Sort sort = Sort.by(Sort.Order.desc("id"));
+        Pageable pageable = PageRequest.of(pageNo,pageSize,sort);
+        Page<User> listAdmin = userRepository.findByRolesEquals(role,pageable);
+
+        List<UserDto> userDtos = null;
+        if(listAdmin != null){
+            Type listType =  new TypeToken<List<UserDto>>() {}.getType ();
+            userDtos = modelMapper.map(listAdmin.getContent(),listType);
+            return new PageImpl<>(userDtos,pageable,listAdmin.getTotalElements());
+        }
+        return null;
     }
 
 }

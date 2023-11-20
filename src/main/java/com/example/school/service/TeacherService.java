@@ -1,8 +1,10 @@
 package com.example.school.service;
 
+import com.example.school.dto.StudentDto;
 import com.example.school.dto.TeacherDto;
 import com.example.school.entity.Teacher;
 import com.example.school.form.teacher.FormManageTeacher;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -23,4 +25,6 @@ public interface TeacherService {
 
     public void rest(int id);
     public void comeback(int id);
+
+    public Page<TeacherDto> findPaginated(int pageNo, int pageSize);
 }

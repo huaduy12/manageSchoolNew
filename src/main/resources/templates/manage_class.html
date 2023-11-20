@@ -82,15 +82,25 @@
                         <div class="card">
                             <div class="card-body">
                                 <h4  class="card-title">Quản lý lớp học</h4>
-                                <button th:if="${showClass}" type="button" class="btn btn-info ml-4 add-button" data-toggle="modal" data-target="#modalAddEdit">
-                                    <i class="fa fa-plus" aria-hidden="true"></i> Thêm lớp học</button>
-                                <a th:if="${showClass}" th:href="@{/manage/year_school}" class="btn btn-warning ml-4" >
-                                    <i class="fa fa-calendar-check-o" aria-hidden="true"></i> Quản lí năm học, kỳ học</a>
+
+
+                                <div class="row">
+                                    <div class="col-8">
+                                        <button th:if="${showClass}" type="button" class="btn btn-info ml-4 add-button" data-toggle="modal" data-target="#modalAddEdit">
+                                            <i class="fa fa-plus" aria-hidden="true"></i> Thêm lớp học</button>
+                                        <a th:if="${showClass}" th:href="@{/manage/year_school}" class="btn btn-warning ml-4" >
+                                            <i class="fa fa-calendar-check-o" aria-hidden="true"></i> Quản lí năm học, kỳ học</a>
+                                    </div>
+
+                                    <div class="col-4">
+                                        <div class="input-group icons">
+                                            <input type="search" class="form-control" style="border: 2px solid #ced4da;" placeholder="Tìm kiếm theo tên, tên giáo viên" aria-label="Tìm kiếm">
+                                        </div>
+                                    </div>
+                                </div>
 <!--                                nên làm thành mục lớn từu năm học ,kỳ học có thêr xem dduojc lơp học, thầy cô, học sinh-->
                                 <div class="table-responsive">
-                                  
-                                    <table class="table table-striped table-bordered zero-configuration">
-                                        
+                                    <table class="table table-bordered verticle-middle header-border table-hover">
                                         <thead>
                                             <tr>
                                                 <th>Tên lớp</th>
@@ -103,7 +113,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr th:each="classroom : ${classroomDtos}">
+                                            <tr th:each="classroom : ${classroomDtos.getContent()}">
                                                 <td th:text="${classroom.name}"></td>
                                                 <td th:text="${classroom.academic_year}"></td>
                                                 <td th:text="${classroom.note}"></td>
@@ -156,6 +166,71 @@
                                          
                                     </table>
                                 </div>
+
+                                <!-- start pagination   -->
+                                <div th:if="${classroomDtos.getTotalPages() >0}">
+                                    <!-- start total element  -->
+                                    <div th:if="${(pageNo -1) * pageSize +1} < ${classroomDtos.getTotalElements()}" class="text-left" th:text="${(pageNo -1) * pageSize +1} + ' - ' + (${pageNo*pageSize} > ${classroomDtos.getTotalElements()} ? ${classroomDtos.getTotalElements()} : ${pageNo*pageSize} ) + ' of ' + ${classroomDtos.getTotalElements()}"></div>
+                                    <div th:if="${(pageNo -1) * pageSize +1} == ${classroomDtos.getTotalElements()}" class="text-left" th:text="(${pageNo*pageSize} > ${classroomDtos.getTotalElements()} ? ${classroomDtos.getTotalElements()} : ${pageNo*pageSize} ) + ' of ' + ${classroomDtos.getTotalElements()}"></div>
+                                    <!-- end total element  -->
+
+                                    <div class="bootstrap-pagination">
+                                        <nav  th:if="${classroomDtos.getTotalPages() >1}">
+                                            <ul class="pagination justify-content-end">
+
+                                                <li class="page-item " th:if="${pageNo > 1}">
+                                                    <a th:if="${showClass}" class="page-link" th:href="'/manage/class/page/' + (${pageNo}-1)" tabindex="-1">Previous</a>
+                                                    <a th:if="${showScore}" class="page-link" th:href="'/manage/score/page/' + (${pageNo}-1)" tabindex="-1">Previous</a>
+                                                    <a th:if="${showAssign}" class="page-link" th:href="'/manage/assign/page/' + (${pageNo}-1)" tabindex="-1">Previous</a>
+                                                </li>
+                                                <!-- print pages smaller than 6  -->
+                                                <li th:if="${pageNo < 6}" class="page-item" th:each="i : ${#numbers.sequence(1,classroomDtos.getTotalPages())}">
+                                                    <a class="page-link" th:if="${pageNo != i and showClass == true }" th:href="@{'/manage/class/page/' + ${i}}" th:text="${i}"></a>
+                                                    <a class="page-link" th:if="${pageNo != i and showScore == true}" th:href="@{'/manage/score/page/' + ${i}}" th:text="${i}"></a>
+                                                    <a class="page-link" th:if="${pageNo != i and showAssign == true}" th:href="@{'/manage/assign/page/' + ${i}}" th:text="${i}"></a>
+
+                                                    <a class="page-link" style="color: #000" th:unless="${pageNo != i}" th:text="${i}"></a>
+                                                </li>
+
+
+                                                <!-- print pages larger than or equal to 6  -->
+                                                <li th:if="${pageNo >= 6 }" class="page-item">
+                                                    <a th:if="${showClass}" class="page-link"  th:href="@{/manage/class/page/1}" th:text="'1'"></a>
+                                                    <a th:if="${showScore}" class="page-link"  th:href="@{/manage/score/page/1}" th:text="'1'"></a>
+                                                    <a th:if="${showAssign}" class="page-link"  th:href="@{/manage/assign/page/1}" th:text="'1'"></a>
+                                                </li>
+                                                <li th:if="${pageNo >= 6 }" class="page-item">
+                                                    <a class="page-link" style="color: #000" th:text="'...'"></a>
+                                                </li>
+
+                                                <li th:if="${pageNo >= 6 and pageNo < classroomDtos.getTotalPages()  }" class="page-item" th:each="i : ${#numbers.sequence((pageNo)-1,(pageNo)+1)}">
+                                                    <a class="page-link" th:if="${pageNo != i and showClass == true }" th:href="@{'/manage/class/page/' + ${i}}" th:text="${i}"></a>
+                                                    <a class="page-link" th:if="${pageNo != i and showScore == true}" th:href="@{'/manage/score/page/' + ${i}}" th:text="${i}"></a>
+                                                    <a class="page-link" th:if="${pageNo != i and showAssign ==true}" th:href="@{'/manage/assign/page/' + ${i}}" th:text="${i}"></a>
+
+                                                    <a class="page-link" style="color: #000" th:unless="${pageNo != i}" th:text="${i}"></a>
+                                                </li>
+                                                <!-- conditions print last page  -->
+                                                <li th:if="${pageNo >= 6 and pageNo == classroomDtos.getTotalPages()}" class="page-item" th:each="i : ${#numbers.sequence((pageNo)-2,(pageNo))}">
+                                                    <a class="page-link" th:if="${pageNo != i and showClass == true}" th:href="@{'/manage/class/page/' + ${i}}" th:text="${i}"></a>
+                                                    <a class="page-link" th:if="${pageNo != i  and showScore == true}" th:href="@{'/manage/score/page/' + ${i}}" th:text="${i}"></a>
+                                                    <a class="page-link" th:if="${pageNo != i  and showAssign == true}" th:href="@{'/manage/assign/page/' + ${i}}" th:text="${i}"></a>
+
+                                                    <a class="page-link" style="color: #000" th:unless="${pageNo != i}" th:text="${i}"></a>
+                                                </li>
+
+
+                                                <li class="page-item " th:if="${pageNo < classroomDtos.getTotalPages()}">
+                                                    <a th:if="${showClass}" class="page-link" th:href="'/manage/class/page/' + (${pageNo}+1)" tabindex="-1">Next</a>
+                                                    <a th:if="${showScore}" class="page-link" th:href="'/manage/score/page/' + (${pageNo}+1)" tabindex="-1">Next</a>
+                                                    <a th:if="${showAssign}" class="page-link" th:href="'/manage/assign/page/' + (${pageNo}+1)" tabindex="-1">Next</a>
+                                                </li>
+                                            </ul>
+                                        </nav>
+                                    </div>
+                                </div>
+                                <!-- end pagination   -->
+
                             </div>
                         </div>
                     </div>
@@ -193,6 +268,7 @@
         <form method="post", th:action="@{/manage/class/save}" th:object="${formClassroom}">
             <div class="modal-body" id ="modalError" th:data-has-errors="${#fields.hasErrors()}">
                 <input type="hidden" id="id" th:field="*{id}">
+                <input type="hidden"  name="pageNo" th:value="${pageNo}">
                 <input type="hidden"  name="form" value="form">
                 <div class="form-group">
                     <label for="nameClass">Tên lớp học</label>

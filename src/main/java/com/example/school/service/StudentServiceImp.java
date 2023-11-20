@@ -1,5 +1,6 @@
 package com.example.school.service;
 
+import com.example.school.configuration.Pagination;
 import com.example.school.dto.StudentDto;
 import com.example.school.dto.TeacherDto;
 import com.example.school.entity.*;
@@ -12,6 +13,7 @@ import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Type;
@@ -242,5 +244,19 @@ public class StudentServiceImp implements StudentService{
     public List<Student> getStudentByClassId(int classId) {
         List<Student> students = studentRepository.findAllByClassroom_Id(classId);
         return students;
+    }
+    @Override
+    public Page<StudentDto> findPaginated(int pageNo,int pageSize) {
+        Sort sort = Sort.by(Sort.Order.desc("id"));
+        Pageable pageable = PageRequest.of(pageNo,pageSize,sort);
+        Page<Student> students = studentRepository.findAll(pageable);
+        List<StudentDto> studentsDto = null;
+        if(students != null){
+            Type listType =  new TypeToken<List<StudentDto>>() {}.getType ();
+            studentsDto = modelMapper.map(students.getContent(),listType);
+        return new PageImpl<>(studentsDto,pageable,students.getTotalElements());
+        }
+
+        return null;
     }
 }

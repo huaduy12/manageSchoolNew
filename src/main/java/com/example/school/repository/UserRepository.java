@@ -2,6 +2,8 @@ package com.example.school.repository;
 
 import com.example.school.entity.Role;
 import com.example.school.entity.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -11,7 +13,18 @@ import java.util.List;
 @Repository
 public interface UserRepository extends JpaRepository<User,Integer> {
 
-    public List<User> findByRolesEquals(Role role);
+    public Page<User> findByRolesEquals(Role role, Pageable pageable);
+
+
+
+    @Query("SELECT u FROM User u JOIN u.roles ur WHERE ur.id = 2 AND NOT EXISTS " +
+            "(SELECT 1 FROM User u2 JOIN u2.roles ur2 WHERE u2 = u AND ur2.id =1)")
+    Page<User> findManagersWithoutAdmin(Pageable pageable);
+
+    @Query("SELECT u FROM User u JOIN u.roles ur WHERE ur.id = 3 AND NOT EXISTS " +
+            "(SELECT 1 FROM User u2 JOIN u2.roles ur2 WHERE u2 = u AND ur2.id =2)")
+    Page<User> findStudentsWithoutManager(Pageable pageable);
+    // 1: Admin, 2: Manager, 3: Student
 
     @Query("select u from User u where u.username like ?1 and u.username not like ?2 ")
     public User getUserExist(String usernameNew, String usernameOrigin);

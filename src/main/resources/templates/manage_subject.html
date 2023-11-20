@@ -76,10 +76,20 @@
                         <div class="card">
                             <div class="card-body">
                                 <h4 class="card-title">Quản lý môn học</h4>
-                                <button th:if="${showSubject}" type="button" class="btn btn-info ml-4 add-button" data-toggle="modal" data-target="#modalAddEdit">
-                                    <i class="fa fa-plus" aria-hidden="true"></i> Thêm môn học</button>    
+
+                                <div class="row">
+                                    <div class="col-8">
+                                        <button th:if="${showSubject}" type="button" class="btn btn-info ml-4 add-button" data-toggle="modal" data-target="#modalAddEdit">
+                                            <i class="fa fa-plus" aria-hidden="true"></i> Thêm môn học</button>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="input-group icons">
+                                            <input type="search" class="form-control" style="border: 2px solid #ced4da;" placeholder="Tìm kiếm theo tên môn học" aria-label="Tìm kiếm">
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="table-responsive">
-                                    <table class="table table-striped table-bordered zero-configuration">
+                                    <table class="table table-bordered verticle-middle header-border table-hover">
                                         <thead>
                                             <tr>
                                                 <th>Mã MH</th>
@@ -90,7 +100,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr th:each="subject : ${subjectDtos}">
+                                            <tr th:each="subject : ${subjectDtos.getContent()}">
                                                 <td th:text="${subject.id}"></td>
                                                 <td th:text="${subject.name}"></td>
                                                 <td th:text="${subject.status} ? 'Đang mở' : 'Đã khóa'"
@@ -108,6 +118,55 @@
                                          
                                     </table>
                                 </div>
+
+                               <!-- start pagination   -->
+                                <div th:if="${subjectDtos.getTotalPages() >0}">
+                                    <!-- start total element  -->
+                                    <div th:if="${(pageNo -1) * pageSize +1} < ${subjectDtos.getTotalElements()}" class="text-left" th:text="${(pageNo -1) * pageSize +1} + ' - ' + (${pageNo*pageSize} > ${subjectDtos.getTotalElements()} ? ${subjectDtos.getTotalElements()} : ${pageNo*pageSize} ) + ' of ' + ${subjectDtos.getTotalElements()}"></div>
+                                    <div th:if="${(pageNo -1) * pageSize +1} == ${subjectDtos.getTotalElements()}" class="text-left" th:text="(${pageNo*pageSize} > ${subjectDtos.getTotalElements()} ? ${subjectDtos.getTotalElements()} : ${pageNo*pageSize} ) + ' of ' + ${subjectDtos.getTotalElements()}"></div>
+                                    <!-- end total element  -->
+
+                                    <div class="bootstrap-pagination">
+                                        <nav  th:if="${subjectDtos.getTotalPages() >1}">
+                                            <ul class="pagination justify-content-end">
+
+                                                <li class="page-item " th:if="${pageNo > 1}"><a class="page-link" th:href="'/manage/subject/page/' + (${pageNo}-1)" tabindex="-1">Previous</a>
+                                                </li>
+                                                <!-- print pages smaller than 6  -->
+                                                <li th:if="${pageNo < 6}" class="page-item" th:each="i : ${#numbers.sequence(1,subjectDtos.getTotalPages())}">
+                                                    <a class="page-link" th:if="${pageNo != i}" th:href="@{'/manage/subject/page/' + ${i}}" th:text="${i}"></a>
+                                                    <a class="page-link" style="color: #000" th:unless="${pageNo != i}" th:text="${i}"></a>
+                                                </li>
+
+
+                                                <!-- print pages larger than or equal to 6  -->
+                                                <li th:if="${pageNo >= 6 }" class="page-item">
+                                                    <a class="page-link"  th:href="@{/manage/subject/page/1}" th:text="'1'"></a>
+                                                </li>
+                                                <li th:if="${pageNo >= 6 }" class="page-item">
+                                                    <a class="page-link" style="color: #000" th:text="'...'"></a>
+                                                </li>
+
+                                                <li th:if="${pageNo >= 6 and pageNo < subjectDtos.getTotalPages()  }" class="page-item" th:each="i : ${#numbers.sequence((pageNo)-1,(pageNo)+1)}">
+                                                    <a class="page-link" th:if="${pageNo != i}" th:href="@{'/manage/subject/page/' + ${i}}" th:text="${i}"></a>
+                                                    <a class="page-link" style="color: #000" th:unless="${pageNo != i}" th:text="${i}"></a>
+                                                </li>
+                                                <!-- conditions print last page  -->
+                                                <li th:if="${pageNo >= 6 and pageNo == subjectDtos.getTotalPages()}" class="page-item" th:each="i : ${#numbers.sequence((pageNo)-2,(pageNo))}">
+                                                    <a class="page-link" th:if="${pageNo != i}" th:href="@{'/manage/subject/page/' + ${i}}" th:text="${i}"></a>
+                                                    <a class="page-link" style="color: #000" th:unless="${pageNo != i}" th:text="${i}"></a>
+                                                </li>
+
+
+                                                <li class="page-item " th:if="${pageNo < subjectDtos.getTotalPages()}"><a class="page-link" th:href="'/manage/subject/page/' + (${pageNo}+1)" tabindex="-1">Next</a>
+
+                                                </li>
+                                            </ul>
+                                        </nav>
+                                    </div>
+                                </div>
+                                <!-- end pagination   -->
+
                             </div>
                         </div>
                     </div>
@@ -145,13 +204,8 @@
         <form method="post" th:object="${subjectDto}" th:action="@{/manage/subject/save}">
             <input type="hidden"  id="id" th:field="*{id}">
             <input type="hidden"  name="form" value="form">
-
+            <input type="hidden"  name="pageNo" th:value="${pageNo}">
             <div class="modal-body" id ="modalError" th:data-has-errors="${#fields.hasErrors()}">
-<!--                <div class="form-group">-->
-
-<!--                    <label for="name">Số thứ tự môn học( 1: 2023TOAN1)</label>-->
-<!--&lt;!&ndash;                    <input type="text" class="form-control" id="name">&ndash;&gt;-->
-<!--                </div>-->
                 <div class="form-group">
                     <label for="name">Tên môn học</label>
                     <input type="text" class="form-control" id="name" th:field="*{name}">

@@ -1,5 +1,6 @@
 package com.example.school.controller;
 
+import com.example.school.configuration.Pagination;
 import com.example.school.dto.UserDto;
 import com.example.school.entity.Student;
 import com.example.school.entity.User;
@@ -9,14 +10,12 @@ import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.lang.reflect.Type;
@@ -34,16 +33,7 @@ public class AccountStudentController {
 
     @GetMapping()
     public String homeTeacher(Model model){
-        List<User> users = userStudentService.getAllAccountStudent();
-        Type listType =  new TypeToken<List<UserDto>>() {}.getType ();
-        List<UserDto> usersDto = modelMapper.map(users,listType);
-//         System.out.println("Đây" +userDtos);
-        model.addAttribute("usersDto",usersDto);
-
-        CreatingUserForm creatingUserForm = new CreatingUserForm();
-        creatingUserForm.setId(0);
-        model.addAttribute("userForm",creatingUserForm);
-        return "manageAccount/user_student";
+        return findPaginated(1,model,null);
     }
 
     @PostMapping("/save")
@@ -53,20 +43,16 @@ public class AccountStudentController {
                        @ModelAttribute("formAdd") String formAdd,
                        @ModelAttribute("formEdit") String formEdit,
                        @ModelAttribute("idStudent") String idStudent,
+                       @ModelAttribute("pageNo") int pageNo,
                        RedirectAttributes redirectAttributes){
-
-        List<User> users = userStudentService.getAllAccountStudent();
-        Type listType =  new TypeToken<List<UserDto>> () {}.getType ();
-        List<UserDto> usersDto = modelMapper.map(users,listType);
 
         UserDto userExist = userStudentService.getUserExist(userForm.getUsername(),usernameOrigin);
         if(userExist != null){
             result.addError(new FieldError("userForm","username","Username đã tồn tại"));
         }
         if(result.hasErrors()){
-            model.addAttribute("usersDto",usersDto);
-            model.addAttribute("userForm",userForm);
-            // System.out.println("Lỗi ở đây" + result.getFieldError());
+
+            findPaginated(pageNo,model,userForm);
             if(formAdd != null && !formAdd.trim().equals("")){
                 model.addAttribute("errorFormAdd","Có lỗi xảy ra");
             }
@@ -80,7 +66,7 @@ public class AccountStudentController {
                     redirectAttributes.addFlashAttribute("errorUsername","Vui lòng nhập ít nhất 8 ký tự");
                     redirectAttributes.addFlashAttribute("errorPassword","Vui lòng nhập ít nhất 8 ký tự");
                 }
-                return "redirect:/account/student?id=" + idStudent;
+                return "redirect:/account/student?idStudent=" + idStudent;
             }
             return "/manageAccount/user_student";
         }
@@ -106,6 +92,9 @@ public class AccountStudentController {
         else {
             userStudentService.save(userForm);
             redirectAttributes.addFlashAttribute("changeSuccess","Lưu thành công");
+            if(!formEdit.equals(" ")){
+                return "redirect:/account/student/page/" + pageNo;
+            }
             return "redirect:/account/student";
         }
         return "redirect:/account/student";
@@ -144,5 +133,27 @@ public class AccountStudentController {
         return "redirect:/account/student";
     }
 
+    @GetMapping("/page/{pageNo}")
+    public String findPaginated(@PathVariable(value = "pageNo") int pageNo, Model model,
+                                CreatingUserForm creatingUserForm){
 
+        if(pageNo <= 0) return "redirect:/account/student";
+        int pageSize = Pagination.pageSize;
+        Page<UserDto> userDtos = userStudentService.findPaginated(pageNo-1,pageSize);
+
+        model.addAttribute("pageNo",pageNo);
+        model.addAttribute("pageSize",pageSize);
+        model.addAttribute("userDtos",userDtos);
+
+        // thông tin các lớp đang còn học để phục vụ cho form add, edit
+        if(creatingUserForm == null){
+            creatingUserForm = new CreatingUserForm();
+            creatingUserForm.setId(0);
+            model.addAttribute("userForm",creatingUserForm);
+        }else {
+            model.addAttribute("userForm",creatingUserForm);
+
+        }
+        return "/manageAccount/user_student";
+    }
 }

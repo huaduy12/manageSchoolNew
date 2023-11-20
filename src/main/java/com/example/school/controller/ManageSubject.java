@@ -1,7 +1,9 @@
 package com.example.school.controller;
 
+import com.example.school.configuration.Pagination;
 import com.example.school.dto.SubjectDto;
 import com.example.school.dto.TeacherDto;
+import com.example.school.entity.Subject;
 import com.example.school.entity.Teacher_class;
 import com.example.school.form.teacher.FormManageTeacher;
 import com.example.school.service.SubjectService;
@@ -9,6 +11,7 @@ import com.example.school.service.TeacherClassService;
 import com.example.school.service.TeacherService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -29,28 +32,16 @@ public class ManageSubject {
 
     @GetMapping()
     public String homeClass(Model model){
-        List<SubjectDto> subjectDtos = subjectService.getAllSubject();
-        model.addAttribute("subjectDtos",subjectDtos);
-
-        SubjectDto subjectDto = new SubjectDto();
-        subjectDto.setId(0);
-        model.addAttribute("subjectDto",subjectDto);
-        model.addAttribute("showSubject",true);
-
-        return "/manage_subject";
+        return findPaginated(1,model,null);
     }
 
     @PostMapping("/save")
     public String save(@Valid @ModelAttribute("subjectDto") SubjectDto subjectDto,
                        BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes,
-                       @ModelAttribute("form") String form){
+                       @ModelAttribute("form") String form,@ModelAttribute("pageNo") int pageNo){
 
-        System.out.println(subjectDto);
-        List<SubjectDto> subjectDtos = subjectService.getAllSubject();
-        //  System.out.println(formManageTeacher);
         if(bindingResult.hasErrors()){
-            model.addAttribute("subjectDtos",subjectDtos);
-            model.addAttribute("subjectDto",subjectDto);
+            findPaginated(pageNo,model,subjectDto);
             if(!form.trim().equals("")){
                 model.addAttribute("formError","Có lỗi ở form");
             }
@@ -58,7 +49,7 @@ public class ManageSubject {
         }
         subjectService.save(subjectDto);
         redirectAttributes.addFlashAttribute("changeSuccess","Lưu thành công");
-        return "redirect:/manage/subject";
+        return "redirect:/manage/subject/page/"+pageNo;
     }
 
 
@@ -106,4 +97,31 @@ public class ManageSubject {
 
         return "manage_teacher";
     }
+
+    @GetMapping("/page/{pageNo}")
+    public String findPaginated(@PathVariable(value = "pageNo") int pageNo,Model model,
+                                SubjectDto subjectDto
+    ){
+
+        if(pageNo <= 0) return "redirect:/manage/subject";
+        int pageSize = Pagination.pageSize;
+        Page<SubjectDto> subjectDtos = subjectService.findPaginated(pageNo-1,pageSize);
+
+        model.addAttribute("pageNo",pageNo);
+        model.addAttribute("pageSize",pageSize);
+        model.addAttribute("subjectDtos",subjectDtos);
+
+        // thông tin các lớp đang còn học để phục vụ cho form add, edit
+        if(subjectDto == null){
+            subjectDto = new SubjectDto();
+            subjectDto.setId(0);
+            model.addAttribute("subjectDto",subjectDto);
+        }else {
+            model.addAttribute("subjectDto",subjectDto);
+        }
+        model.addAttribute("showSubject",true);
+        return "manage_subject";
+    }
+
+
 }

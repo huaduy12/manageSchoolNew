@@ -4,12 +4,11 @@ import com.example.school.dto.UserDto;
 import com.example.school.entity.Teacher;
 import com.example.school.entity.User;
 import com.example.school.form.user.CreatingUserForm;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
 public interface UserTeacherService {
-
-    public List<User> getAllAccountTeacher();
 
     public void save(CreatingUserForm creatingUserForm);
 
@@ -28,4 +27,6 @@ public interface UserTeacherService {
     public UserDto finById(int id);
 
     public UserDto getUserExist(String usernameNew, String usernameOrigin);
+
+    public Page<UserDto> findPaginated(int pageNo, int pageSize);
 }

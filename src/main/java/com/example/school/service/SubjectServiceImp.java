@@ -1,16 +1,17 @@
 package com.example.school.service;
 
+import com.example.school.dto.StudentDto;
 import com.example.school.dto.SubjectDto;
+import com.example.school.dto.TeacherDto;
 import com.example.school.dto.Teacher_classDto;
-import com.example.school.entity.Classroom;
-import com.example.school.entity.Subject;
-import com.example.school.entity.Teacher_class;
+import com.example.school.entity.*;
 import com.example.school.repository.SubjectRepository;
 import com.example.school.repository.TeacherClassRepository;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.modelmapper.internal.bytebuddy.description.method.MethodDescription;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Type;
@@ -123,4 +124,22 @@ public class SubjectServiceImp implements SubjectService{
         List<Teacher_classDto> teacher_classes = getByClass_id(class_id);
         return teacher_classes;
     }
+
+    @Override
+    public Page<SubjectDto> findPaginated(int pageNo, int pageSize) {
+
+        Sort sort = Sort.by(Sort.Order.desc("id"));
+        Pageable pageable = PageRequest.of(pageNo,pageSize,sort);
+        Page<Subject> subjects = subjectRepository.findAll(pageable);
+
+        List<SubjectDto> subjectDtos = null;
+        if(subjects != null){
+            Type listType =  new TypeToken<List<SubjectDto>>() {}.getType ();
+            subjectDtos = modelMapper.map(subjects.getContent(),listType);
+            return new PageImpl<>(subjectDtos,pageable,subjects.getTotalElements());
+        }
+        return null;
+    }
+
+
 }

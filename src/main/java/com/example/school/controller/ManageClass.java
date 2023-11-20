@@ -1,5 +1,6 @@
 package com.example.school.controller;
 
+import com.example.school.configuration.Pagination;
 import com.example.school.dto.*;
 import com.example.school.entity.Classroom;
 import com.example.school.entity.School_year;
@@ -16,6 +17,7 @@ import com.example.school.service.*;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -49,25 +51,17 @@ public class ManageClass {
 
     @GetMapping()
     public String homeClass(Model model){
-        List<ClassroomDto> classroomDtos = classroomService.getClassRoom();
-        model.addAttribute("classroomDtos",classroomDtos);
-        FormClassroom formClassroom = new FormClassroom();
-        formClassroom.setId(0);
-        model.addAttribute("formClassroom",formClassroom);
-        model.addAttribute("showClass",true);
-        return "/manage_class";
+       return findPaginated(1,model,null);
     }
 
     @PostMapping("/save")
     public String save(@Valid @ModelAttribute("formClassroom") FormClassroom formClassroom,
                        BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes,
-                       @ModelAttribute("form") String form){
+                       @ModelAttribute("form") String form,  @ModelAttribute("pageNo") int pageNo){
 
-        List<ClassroomDto> classroomDtos = classroomService.getClassRoom();
-        //  System.out.println(formManageTeacher);
+
         if(bindingResult.hasErrors()){
-            model.addAttribute("classroomDtos",classroomDtos);
-            model.addAttribute("formClassroom",formClassroom);
+            findPaginated(pageNo,model,formClassroom);
             if(!form.trim().equals("")){
                 model.addAttribute("formError","Có lỗi ở form");
             }
@@ -79,7 +73,7 @@ public class ManageClass {
         }else {
             redirectAttributes.addFlashAttribute("changeFail","Lưu thất bại");
         }
-        return "redirect:/manage/class";
+        return "redirect:/manage/class/page/"+ pageNo;
     }
 
     @PostMapping("/block")
@@ -281,6 +275,32 @@ public class ManageClass {
 
 
         return "subject_teacher";
+    }
+
+    @GetMapping("/page/{pageNo}")
+    public String findPaginated(@PathVariable(value = "pageNo") int pageNo,Model model,
+                                FormClassroom formClassroom
+    ){
+
+        if(pageNo <= 0) return "redirect:/manage/class";
+        int pageSize = Pagination.pageSize;
+        Page<ClassroomDto> classroomDtos = classroomService.findPaginated(pageNo-1,pageSize);
+
+        model.addAttribute("pageNo",pageNo);
+        model.addAttribute("pageSize",pageSize);
+        model.addAttribute("classroomDtos",classroomDtos);
+
+        // thông tin các lớp đang còn học để phục vụ cho form add, edit
+        if(formClassroom == null){
+            formClassroom = new FormClassroom();
+            formClassroom.setId(0);
+            model.addAttribute("formClassroom",formClassroom);
+        }else {
+            model.addAttribute("formClassroom",formClassroom);
+        }
+        model.addAttribute("showClass",true);
+
+        return "manage_class";
     }
 
 }

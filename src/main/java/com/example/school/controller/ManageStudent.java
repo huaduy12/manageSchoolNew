@@ -1,5 +1,6 @@
 package com.example.school.controller;
 
+import com.example.school.configuration.Pagination;
 import com.example.school.dto.ClassroomDto;
 import com.example.school.dto.ScoreDto;
 import com.example.school.dto.StudentDto;
@@ -15,6 +16,7 @@ import com.example.school.service.StudentService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -43,32 +45,44 @@ public class ManageStudent {
 
     @GetMapping()
     public String homeStudent(Model model){
-        List<StudentDto> studentsDto = studentService.getAllStudent();
-        model.addAttribute("studentsDto",studentsDto);
+        return findPaginated(1,model,null);
+    }
 
+    @GetMapping("/page/{pageNo}")
+    public String findPaginated(@PathVariable(value = "pageNo") int pageNo,Model model,FormStudent formStudent){
+
+        if(pageNo <= 0) return "redirect:/manage/student";
+        int pageSize = Pagination.pageSize;
+        Page<StudentDto> studentDtos = studentService.findPaginated(pageNo-1,pageSize);
+
+        model.addAttribute("pageNo",pageNo);
+        model.addAttribute("pageSize",pageSize);
+
+        model.addAttribute("studentDtos",studentDtos);
         // thông tin các lớp đang còn học để phục vụ cho form add, edit
         List<ClassroomDto> classroomsDto = classroomService.getClassRoomStudying();
         model.addAttribute("classroomsDto",classroomsDto);
+        if(formStudent == null){
+            formStudent = new FormStudent();
+            formStudent.setId(0);
+            model.addAttribute("formStudent",formStudent);
+        }else {
+            model.addAttribute("formStudent",formStudent);
+        }
 
-        FormStudent formStudent = new FormStudent();
-        formStudent.setId(0);
-        model.addAttribute("formStudent",formStudent);
-        return "/manage_student";
+
+        return "manage_student";
     }
 
     @PostMapping("/save")
     public String save(@Valid @ModelAttribute("formStudent") FormStudent formStudent,
                        BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes,
-                       @ModelAttribute("form") String form){
+                       @ModelAttribute("form") String form,
+                       @ModelAttribute("pageNo") int pageNo){
 
-        List<StudentDto> studentsDto = studentService.getAllStudent();
-        List<ClassroomDto> classroomsDto = classroomService.getClassRoomStudying();
 
         if(bindingResult.hasErrors()){
-            model.addAttribute("studentsDto",studentsDto);
-            model.addAttribute("formStudent",formStudent);
-            model.addAttribute("classroomsDto",classroomsDto);
-
+            findPaginated(pageNo,model,formStudent);
             if(!form.trim().equals("")){
                 model.addAttribute("formError","Có lỗi ở form");
             }
@@ -76,7 +90,7 @@ public class ManageStudent {
         }
         studentService.save(formStudent);
         redirectAttributes.addFlashAttribute("changeSuccess","Lưu thành công");
-        return "redirect:/manage/student";
+        return "redirect:/manage/student/page/"+pageNo;
     }
 
     @PostMapping("/delete")

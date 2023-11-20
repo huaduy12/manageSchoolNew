@@ -8,6 +8,7 @@ import com.example.school.entity.Teacher;
 import com.example.school.form.student.FormProfileStudent;
 import com.example.school.form.student.FormStudent;
 import com.example.school.repository.StudentRepository;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -46,4 +47,5 @@ public interface StudentService {
     public List<StudentDto> getStudentByClassIdDto(int classId);
     public List<Student> getStudentByClassId(int classId);
 
+    public Page<StudentDto> findPaginated(int pageNo,int pageSize);
 }
