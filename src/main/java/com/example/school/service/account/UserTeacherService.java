@@ -28,5 +28,5 @@ public interface UserTeacherService {
 
     public UserDto getUserExist(String usernameNew, String usernameOrigin);
 
-    public Page<UserDto> findPaginated(int pageNo, int pageSize);
+    public Page<UserDto> findPaginated(int pageNo, int pageSize,String keyword);
 }

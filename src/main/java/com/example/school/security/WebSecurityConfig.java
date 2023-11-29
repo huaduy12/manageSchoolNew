@@ -48,9 +48,11 @@ public class WebSecurityConfig {
                         logout->logout.permitAll()
 
                 )
+
                 .exceptionHandling(
                         configurer -> configurer.accessDeniedPage("/error/showPage403")
-                );
+                )
+               ;
 
         return http.build();
 

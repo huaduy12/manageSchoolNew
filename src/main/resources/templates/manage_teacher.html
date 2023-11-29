@@ -89,7 +89,11 @@
                                     </div>
                                     <div class="col-4">
                                         <div class="input-group icons">
-                                            <input type="search" class="form-control" style="border: 2px solid #ced4da;" placeholder="Tìm kiếm theo tên,tên tài khoản" aria-label="Tìm kiếm">
+                                           <form method="get" style="display: inherit;width: 100%">
+                                                <input type="search" name="keyword" th:value="${keyword}" class="form-control" style="border: 2px solid #ced4da;" placeholder="Tìm kiếm" aria-label="Tìm kiếm">
+                                                 <button type="submit" id="buttonSearch" class="btn btn-danger" style="border-radius: 0px">
+                                                    <i class="fa fa-search" aria-hidden="true"></i> </button>
+                                           </form>
                                         </div>
                                     </div>
                                 </div>
@@ -154,35 +158,33 @@
                                         <nav  th:if="${teacherDtos.getTotalPages() >1}">
                                             <ul class="pagination justify-content-end">
 
-                                                <li class="page-item " th:if="${pageNo > 1}"><a class="page-link" th:href="'/manage/teacher/page/' + (${pageNo}-1)" tabindex="-1">Previous</a>
+                                                <li class="page-item " th:if="${pageNo > 1}"><a class="page-link" th:href="'/manage/teacher/page/' + (${pageNo}-1) + ${keyword != null ? '?keyword=' + keyword : ''}" tabindex="-1">Previous</a>
                                                 </li>
                                                 <!-- print pages smaller than 6  -->
                                                 <li th:if="${pageNo < 6}" class="page-item" th:each="i : ${#numbers.sequence(1,teacherDtos.getTotalPages())}">
-                                                    <a class="page-link" th:if="${pageNo != i}" th:href="@{'/manage/teacher/page/' + ${i}}" th:text="${i}"></a>
+                                                    <a class="page-link" th:if="${pageNo != i}" th:href="@{'/manage/teacher/page/' + ${i} + ${keyword != null ? '?keyword=' + keyword : ''}}" th:text="${i}"></a>
                                                     <a class="page-link" style="color: #000" th:unless="${pageNo != i}" th:text="${i}"></a>
                                                 </li>
 
 
                                                 <!-- print pages larger than or equal to 6  -->
                                                 <li th:if="${pageNo >= 6 }" class="page-item">
-                                                    <a class="page-link"  th:href="@{/manage/teacher/page/1}" th:text="'1'"></a>
+                                                    <a class="page-link"  th:href="@{'/manage/teacher/page/1' + ${keyword != null ? '?keyword=' + keyword : ''} }" th:text="'1'"></a>
                                                 </li>
                                                 <li th:if="${pageNo >= 6 }" class="page-item">
                                                     <a class="page-link" style="color: #000" th:text="'...'"></a>
                                                 </li>
 
                                                 <li th:if="${pageNo >= 6 and pageNo < teacherDtos.getTotalPages()  }" class="page-item" th:each="i : ${#numbers.sequence((pageNo)-1,(pageNo)+1)}">
-                                                    <a class="page-link" th:if="${pageNo != i}" th:href="@{'/manage/teacher/page/' + ${i}}" th:text="${i}"></a>
+                                                    <a class="page-link" th:if="${pageNo != i}" th:href="@{'/manage/teacher/page/' + ${i}+ ${keyword != null ? '?keyword=' + keyword : ''}}" th:text="${i}"></a>
                                                     <a class="page-link" style="color: #000" th:unless="${pageNo != i}" th:text="${i}"></a>
                                                 </li>
                                                 <!-- conditions print last page  -->
                                                 <li th:if="${pageNo >= 6 and pageNo == teacherDtos.getTotalPages()}" class="page-item" th:each="i : ${#numbers.sequence((pageNo)-2,(pageNo))}">
-                                                    <a class="page-link" th:if="${pageNo != i}" th:href="@{'/manage/teacher/page/' + ${i}}" th:text="${i}"></a>
+                                                    <a class="page-link" th:if="${pageNo != i}" th:href="@{'/manage/teacher/page/' + ${i} + ${keyword != null ? '?keyword=' + keyword : ''}}" th:text="${i}"></a>
                                                     <a class="page-link" style="color: #000" th:unless="${pageNo != i}" th:text="${i}"></a>
                                                 </li>
-
-
-                                                <li class="page-item " th:if="${pageNo < teacherDtos.getTotalPages()}"><a class="page-link" th:href="'/manage/teacher/page/' + (${pageNo}+1)" tabindex="-1">Next</a>
+                                                <li class="page-item " th:if="${pageNo < teacherDtos.getTotalPages()}"><a class="page-link" th:href="'/manage/teacher/page/' + (${pageNo}+1) + ${keyword != null ? '?keyword=' + keyword : ''}" tabindex="-1">Next</a>
 
                                                 </li>
                                             </ul>
@@ -435,6 +437,9 @@
             tapToDismiss: !1
         });
     </script>
+
+
+
 
     <!--**********************************
         Scripts

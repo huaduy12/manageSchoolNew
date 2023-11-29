@@ -38,8 +38,8 @@ public class ManageScore {
     private TeacherClassService teacherClassService;
 
     @GetMapping()
-    public String homeClass(Model model){
-      return findPaginatedScoreClass(1,model);
+    public String homeClass(Model model, @RequestParam(value = "keyword",required = false) String keyword){
+      return findPaginatedScoreClass(1,model,keyword);
     }
 
     @GetMapping("/idClass")
@@ -124,12 +124,15 @@ public class ManageScore {
     }
     @GetMapping("/page/{pageNo}")
     public String findPaginatedScoreClass(@PathVariable(value = "pageNo") int pageNo,Model model
-
+                                          , @RequestParam(value = "keyword",required = false) String keyword
     ){
         if(pageNo <= 0) return "redirect:/manage/score";
         int pageSize = Pagination.pageSize;
-        Page<ClassroomDto> classroomDtos = classroomService.findPaginated(pageNo-1,pageSize);
-
+        Page<ClassroomDto> classroomDtos = classroomService.findPaginated(pageNo-1,pageSize,keyword);
+        if(classroomDtos.getTotalElements() != 0 && pageNo > classroomDtos.getTotalPages()){
+            return "redirect:/manage/classroom/page/1?keyword="+keyword;
+        }
+        model.addAttribute("keyword",keyword);
         model.addAttribute("pageNo",pageNo);
         model.addAttribute("pageSize",pageSize);
         model.addAttribute("classroomDtos",classroomDtos);

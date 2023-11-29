@@ -184,12 +184,12 @@ public class UserStudentServiceImp implements UserStudentService{
     }
 
     @Override
-    public Page<UserDto> findPaginated(int pageNo, int pageSize) {
+    public Page<UserDto> findPaginated(int pageNo, int pageSize,String keyword) {
         Role role = roleRepository.findById(3);
 
         Sort sort = Sort.by(Sort.Order.desc("id"));
         Pageable pageable = PageRequest.of(pageNo,pageSize,sort);
-        Page<User> listTeacher = userRepository.findStudentsWithoutManager(pageable);
+        Page<User> listTeacher = userRepository.findStudentsWithoutManager(keyword,pageable);
 
         List<UserDto> userDtos = null;
         if(listTeacher != null){

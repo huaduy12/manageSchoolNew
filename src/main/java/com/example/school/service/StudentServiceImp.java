@@ -246,10 +246,11 @@ public class StudentServiceImp implements StudentService{
         return students;
     }
     @Override
-    public Page<StudentDto> findPaginated(int pageNo,int pageSize) {
+    public Page<StudentDto> findPaginated(int pageNo,int pageSize,String keyword) {
         Sort sort = Sort.by(Sort.Order.desc("id"));
         Pageable pageable = PageRequest.of(pageNo,pageSize,sort);
-        Page<Student> students = studentRepository.findAll(pageable);
+        if(keyword == null) keyword = " ";
+        Page<Student> students = studentRepository.findAll(keyword,pageable);
         List<StudentDto> studentsDto = null;
         if(students != null){
             Type listType =  new TypeToken<List<StudentDto>>() {}.getType ();

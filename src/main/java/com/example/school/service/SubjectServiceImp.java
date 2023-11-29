@@ -9,7 +9,6 @@ import com.example.school.repository.SubjectRepository;
 import com.example.school.repository.TeacherClassRepository;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
-import org.modelmapper.internal.bytebuddy.description.method.MethodDescription;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
@@ -126,11 +125,12 @@ public class SubjectServiceImp implements SubjectService{
     }
 
     @Override
-    public Page<SubjectDto> findPaginated(int pageNo, int pageSize) {
+    public Page<SubjectDto> findPaginated(int pageNo, int pageSize,String keyword) {
 
         Sort sort = Sort.by(Sort.Order.desc("id"));
         Pageable pageable = PageRequest.of(pageNo,pageSize,sort);
-        Page<Subject> subjects = subjectRepository.findAll(pageable);
+        if(keyword == null) keyword = " ";
+        Page<Subject> subjects = subjectRepository.findAll(keyword,pageable);
 
         List<SubjectDto> subjectDtos = null;
         if(subjects != null){

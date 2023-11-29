@@ -66,6 +66,7 @@ public Teacher save(FormManageTeacher formManageTeacher) {
         teacher.setCreatedAt(CopyTeacher.getCreatedAt());
     }
     if(teacher != null){
+         System.out.println(teacher);
          teacher.setStatus(true);
          return teacherRepository.save(teacher);
      }
@@ -134,16 +135,20 @@ public Teacher save(FormManageTeacher formManageTeacher) {
     }
 
     @Override
-    public List<TeacherDto> getTeacherBySubject_id(int subject_id) {
-        List<Teacher_class> teacher_classes = teacherClassRepository.findBySubject_Id(subject_id);
+    public Page<TeacherDto> getTeacherBySubject_id(int subject_id,int pageNo,int pageSize) {
+        Sort sort = Sort.by(Sort.Order.desc("id"));
+        Pageable pageable = PageRequest.of(pageNo,pageSize,sort);
+
+        Page<Teacher_class> teacher_classes = teacherClassRepository.findBySubject_Id(subject_id,pageable);
         List<TeacherDto> teacherDtos = new ArrayList<>();
         if(teacher_classes != null){
-            for(Teacher_class teacher_class : teacher_classes){
+            for(Teacher_class teacher_class : teacher_classes.getContent()){
                 TeacherDto teacherDto = findByIdDto(teacher_class.getTeacher().getId());
                 teacherDtos.add(teacherDto);
             }
         }
-        return teacherDtos;
+
+        return new PageImpl<>(teacherDtos,pageable,teacher_classes.getTotalElements());
     }
 
     @Override
@@ -163,18 +168,21 @@ public Teacher save(FormManageTeacher formManageTeacher) {
     }
 
     @Override
-    public Page<TeacherDto> findPaginated(int pageNo, int pageSize) {
+    public Page<TeacherDto> findPaginated(int pageNo, int pageSize, String keyword) {
 
         Sort sort = Sort.by(Sort.Order.desc("id"));
         Pageable pageable = PageRequest.of(pageNo,pageSize,sort);
-        Page<Teacher> teachers = teacherRepository.findAllByRoleNot(RoleTeacher.Admin,pageable);
+        if(keyword == null) keyword = " ";
+        Page<Teacher> teachers = teacherRepository.findAll(keyword,RoleTeacher.Admin,pageable);
 
         List<TeacherDto> teacherDtos = null;
         if(teachers != null){
             Type listType =  new TypeToken<List<TeacherDto>>() {}.getType ();
             teacherDtos = modelMapper.map(teachers.getContent(),listType);
-            return new PageImpl<>(teacherDtos,pageable,teachers.getTotalElements());
+            //return new PageImpl<>(teacherDtos,pageable,teachers.getTotalElements());
         }
-        return null;
+        return new PageImpl<>(teacherDtos,pageable,teachers.getTotalElements());
     }
+
+
 }

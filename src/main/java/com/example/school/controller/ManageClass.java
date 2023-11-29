@@ -50,18 +50,19 @@ public class ManageClass {
     private ModelMapper modelMapper;
 
     @GetMapping()
-    public String homeClass(Model model){
-       return findPaginated(1,model,null);
+    public String homeClass(Model model,@RequestParam(value = "keyword",required = false) String keyword){
+       return findPaginated(1,model,null,keyword);
     }
 
     @PostMapping("/save")
     public String save(@Valid @ModelAttribute("formClassroom") FormClassroom formClassroom,
                        BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes,
-                       @ModelAttribute("form") String form,  @ModelAttribute("pageNo") int pageNo){
+                       @ModelAttribute("form") String form,  @ModelAttribute("pageNo") int pageNo,
+                       @RequestParam(value = "keyword",required = false) String keyword){
 
 
         if(bindingResult.hasErrors()){
-            findPaginated(pageNo,model,formClassroom);
+            findPaginated(pageNo,model,formClassroom,keyword);
             if(!form.trim().equals("")){
                 model.addAttribute("formError","Có lỗi ở form");
             }
@@ -279,13 +280,17 @@ public class ManageClass {
 
     @GetMapping("/page/{pageNo}")
     public String findPaginated(@PathVariable(value = "pageNo") int pageNo,Model model,
-                                FormClassroom formClassroom
+                                FormClassroom formClassroom,
+                                @RequestParam(value = "keyword",required = false) String keyword
     ){
 
         if(pageNo <= 0) return "redirect:/manage/class";
         int pageSize = Pagination.pageSize;
-        Page<ClassroomDto> classroomDtos = classroomService.findPaginated(pageNo-1,pageSize);
-
+        Page<ClassroomDto> classroomDtos = classroomService.findPaginated(pageNo-1,pageSize,keyword);
+        if(classroomDtos.getTotalElements() != 0 && pageNo > classroomDtos.getTotalPages()){
+            return "redirect:/manage/classroom/page/1?keyword="+keyword;
+        }
+        model.addAttribute("keyword",keyword);
         model.addAttribute("pageNo",pageNo);
         model.addAttribute("pageSize",pageSize);
         model.addAttribute("classroomDtos",classroomDtos);

@@ -32,8 +32,8 @@ public class AccountStudentController {
     ModelMapper modelMapper;
 
     @GetMapping()
-    public String homeTeacher(Model model){
-        return findPaginated(1,model,null);
+    public String homeTeacher(Model model, @RequestParam(value = "keyword",required = false) String keyword){
+        return findPaginated(1,model,null,keyword);
     }
 
     @PostMapping("/save")
@@ -44,7 +44,8 @@ public class AccountStudentController {
                        @ModelAttribute("formEdit") String formEdit,
                        @ModelAttribute("idStudent") String idStudent,
                        @ModelAttribute("pageNo") int pageNo,
-                       RedirectAttributes redirectAttributes){
+                       RedirectAttributes redirectAttributes,
+                       @RequestParam(value = "keyword",required = false) String keyword){
 
         UserDto userExist = userStudentService.getUserExist(userForm.getUsername(),usernameOrigin);
         if(userExist != null){
@@ -52,7 +53,7 @@ public class AccountStudentController {
         }
         if(result.hasErrors()){
 
-            findPaginated(pageNo,model,userForm);
+            findPaginated(pageNo,model,userForm,keyword);
             if(formAdd != null && !formAdd.trim().equals("")){
                 model.addAttribute("errorFormAdd","Có lỗi xảy ra");
             }
@@ -135,12 +136,17 @@ public class AccountStudentController {
 
     @GetMapping("/page/{pageNo}")
     public String findPaginated(@PathVariable(value = "pageNo") int pageNo, Model model,
-                                CreatingUserForm creatingUserForm){
+                                CreatingUserForm creatingUserForm,
+                                @RequestParam(value = "keyword",required = false) String keyword){
 
         if(pageNo <= 0) return "redirect:/account/student";
         int pageSize = Pagination.pageSize;
-        Page<UserDto> userDtos = userStudentService.findPaginated(pageNo-1,pageSize);
-
+        if(keyword == null) keyword = " ";
+        Page<UserDto> userDtos = userStudentService.findPaginated(pageNo-1,pageSize,keyword);
+        if(userDtos.getTotalElements() != 0 && pageNo > userDtos.getTotalPages()){
+            return "redirect:/account/teacher/page/1?keyword="+keyword;
+        }
+        model.addAttribute("keyword",keyword);
         model.addAttribute("pageNo",pageNo);
         model.addAttribute("pageSize",pageSize);
         model.addAttribute("userDtos",userDtos);

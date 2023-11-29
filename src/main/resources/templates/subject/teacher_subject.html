@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <title>Danh sách giáo viên dạy học</title>
+  <th:block th:replace="fragment/header :: html_head"></th:block>
+
+
+  <style>
+    .dropdown-item{
+      width: -webkit-fill-available;
+    }
+  </style>
+</head>
+
+<body>
+
+<!--*******************
+    Preloader start
+********************-->
+<div id="preloader">
+  <div class="loader">
+    <svg class="circular" viewBox="25 25 50 50">
+      <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="3" stroke-miterlimit="10" />
+    </svg>
+  </div>
+</div>
+<!--*******************
+    Preloader end
+********************-->
+
+
+<!--**********************************
+    Main wrapper start
+***********************************-->
+<div id="main-wrapper">
+
+  <!--**********************************
+      Nav header start
+  ***********************************-->
+  <div th:replace="fragment/header :: nav_header">
+  </div>
+  <!--**********************************
+      Nav header end
+  ***********************************-->
+
+  <!--**********************************
+      Header start
+  ***********************************-->
+  <div th:replace="fragment/header :: header">
+  </div>
+  <!--**********************************
+      Header end ti-comment-alt
+  ***********************************-->
+
+  <!--**********************************
+      Sidebar start
+  ***********************************-->
+  <div th:replace="fragment/header :: nk_sidebar"></div>
+  <!--**********************************
+      Sidebar end
+  ***********************************-->
+
+  <!--**********************************
+      Content body start
+  ***********************************-->
+  <div class="content-body">
+
+    <div class="row page-titles mx-0">
+      <div class="col p-md-0">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="javascript:void(0)">Dashboard</a></li>
+          <li class="breadcrumb-item active"><a href="javascript:void(0)">Danh sách giáo viên</a></li>
+        </ol>
+      </div>
+    </div>
+    <!-- row -->
+
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-body">
+              <h4 class="card-title">Danh sách giáo viên dạy học</h4>
+              <div class="table-responsive">
+
+                <table class="table table-bordered verticle-middle header-border table-hover">
+
+                  <thead>
+                  <tr>
+                    <th>Tên</th>
+                    <th>Vai trò</th>
+                    <th>Số điện thoại</th>
+                    <th>Tài khoản</th>
+                    <th>Trạng thái</th>
+
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr th:each="teacher : ${teachersDto.getContent()}">
+                    <td th:text="${teacher.fullName}"></td>
+                    <td th:text="${teacher.role.getDisplayName()}"></td>
+                    <td  th:text="${teacher.phoneNumber}"></td>
+                    <td th:if="${teacher.getUser() != null}" th:text="${teacher.getUser().username}"></td>
+                    <td th:if="${teacher.getUser() == null}" > </td>
+                    <td th:text="${teacher.status} ? 'Đang dạy' : 'Đã nghỉ'"
+                        th:classappend="${teacher.status} ? 'text-success' : 'text-danger'"></td>
+
+                  </tr>
+                </table>
+              </div>
+
+              <!-- start pagination   -->
+              <div th:if="${teachersDto.getTotalPages() >0}">
+                <!-- start total element  -->
+                <div th:if="${(pageNo -1) * pageSize +1} < ${teachersDto.getTotalElements()}" class="text-left" th:text="${(pageNo -1) * pageSize +1} + ' - ' + (${pageNo*pageSize} > ${teachersDto.getTotalElements()} ? ${teachersDto.getTotalElements()} : ${pageNo*pageSize} ) + ' of ' + ${teachersDto.getTotalElements()}"></div>
+                <div th:if="${(pageNo -1) * pageSize +1} == ${teachersDto.getTotalElements()}" class="text-left" th:text="(${pageNo*pageSize} > ${teachersDto.getTotalElements()} ? ${teachersDto.getTotalElements()} : ${pageNo*pageSize} ) + ' of ' + ${teachersDto.getTotalElements()}"></div>
+                <!-- end total element  -->
+
+                <div class="bootstrap-pagination">
+                  <nav  th:if="${teachersDto.getTotalPages() >1}">
+                    <ul class="pagination justify-content-end">
+
+                      <li class="page-item " th:if="${pageNo > 1}"><a class="page-link" th:href="'/manage/subject/teacher?id='+${id}+'&page='+ (${pageNo}-1)" tabindex="-1">Previous</a>
+                      </li>
+                      <!-- print pages smaller than 6  -->
+                      <li th:if="${pageNo < 6}" class="page-item" th:each="i : ${#numbers.sequence(1,teachersDto.getTotalPages())}">
+                        <a class="page-link" th:if="${pageNo != i}" th:href="@{'/manage/subject/teacher?id='+${id}+'&page='+ ${i}}" th:text="${i}"></a>
+                        <a class="page-link" style="color: #000" th:unless="${pageNo != i}" th:text="${i}"></a>
+                      </li>
+
+
+                      <!-- print pages larger than or equal to 6  -->
+                      <li th:if="${pageNo >= 6 }" class="page-item">
+                        <a class="page-link"  th:href="@{/manage/subject/teacher(id=${id},page=1)}" th:text="'1'"></a>
+                      </li>
+                      <li th:if="${pageNo >= 6 }" class="page-item">
+                        <a class="page-link" style="color: #000" th:text="'...'"></a>
+                      </li>
+
+                      <li th:if="${pageNo >= 6 and pageNo < teachersDto.getTotalPages()  }" class="page-item" th:each="i : ${#numbers.sequence((pageNo)-1,(pageNo)+1)}">
+                        <a class="page-link" th:if="${pageNo != i}" th:href="@{'/manage/subject/teacher?id='+${id}+'&page='+ + ${i}}" th:text="${i}"></a>
+                        <a class="page-link" style="color: #000" th:unless="${pageNo != i}" th:text="${i}"></a>
+                      </li>
+                      <!-- conditions print last page  -->
+                      <li th:if="${pageNo >= 6 and pageNo == teachersDto.getTotalPages()}" class="page-item" th:each="i : ${#numbers.sequence((pageNo)-2,(pageNo))}">
+                        <a class="page-link" th:if="${pageNo != i}" th:href="@{'/manage/subject/teacher?id='+${id}+'&page='+ ${i}}" th:text="${i}"></a>
+                        <a class="page-link" style="color: #000" th:unless="${pageNo != i}" th:text="${i}"></a>
+                      </li>
+
+
+                      <li class="page-item " th:if="${pageNo < teachersDto.getTotalPages()}"><a class="page-link" th:href="'/manage/subject/teacher?id='+${id}+'&page='+ (${pageNo}+1)" tabindex="-1">Next</a>
+
+                      </li>
+                    </ul>
+                  </nav>
+                </div>
+              </div>
+              <!-- end pagination   -->
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- #/ container -->
+  </div>
+  <!--**********************************
+      Content body end
+  ***********************************-->
+
+
+  <!--**********************************
+      Footer start
+  ***********************************-->
+  <div th:replace="fragment/footer :: footer">
+  </div>
+  <!--**********************************
+      Footer end
+  ***********************************-->
+</div>
+<!--**********************************
+    Main wrapper end
+***********************************-->
+
+<!-- Modal -->
+<!--<div class="modal fade" id="modalAddEdit" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">-->
+<!--  <div class="modal-dialog" role="document">-->
+<!--    <div class="modal-content">-->
+<!--      <div class="modal-header">-->
+<!--        <h5 class="modal-title" id="exampleModalLabel">Học sinh</h5>-->
+<!--        <button th:if="${formError}" onclick="window.location.href='/manage/student'" type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>-->
+<!--        </button>-->
+
+<!--        <button th:unless="${formError}" type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>-->
+<!--        </button>-->
+<!--      </div>-->
+<!--      <form method="post" th:action="@{/manage/student/save}" th:object="${formStudent}">-->
+<!--        <div class="modal-body" id ="modalError" th:data-has-errors="${#fields.hasErrors()}">-->
+
+<!--          <input type="hidden" class="form-control" id="id" th:field="*{id}">-->
+<!--          <input type="hidden"  name="form" value="form">-->
+<!--          <div class="form-group">-->
+<!--            <label for="fullName">Họ Tên</label>-->
+<!--            <input type="text" class="form-control" id="fullName" th:field="*{fullName}">-->
+<!--            <p class="text-danger" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></p>-->
+<!--          </div>-->
+<!--          <div class="form-group">-->
+<!--            <label for="class">Lớp</label>-->
+<!--            <select class="form-control" id="class" th:field="*{classRoomId}">-->
+<!--              <option label="Vui lòng chọn" value="" > </option>-->
+<!--              <option th:each="classroom : ${classroomsDto}" th:selected="${classroom.id}" th:value="${classroom.id}" th:text="${classroom.name}"></option>-->
+<!--            </select>-->
+<!--            <p class="text-danger" th:if="${#fields.hasErrors('classRoomId')}" th:errors="*{classRoomId}"></p>-->
+<!--          </div>-->
+
+<!--          <div class="form-group">-->
+<!--            <label for="phoneNumber">Niên khóa</label>-->
+<!--            <input type="text" class="form-control" id="academy_year" th:field="*{academy_year}">-->
+<!--            <p class="text-danger" th:if="${#fields.hasErrors('academy_year')}" th:errors="*{academy_year}"></p>-->
+<!--          </div>-->
+
+<!--          <div class="form-group">-->
+<!--            <label for="phoneNumber">Số điện thoại</label>-->
+<!--            <input type="text" class="form-control" id="phoneNumber" th:field="*{phoneNumber}">-->
+<!--            <p class="text-danger" th:if="${#fields.hasErrors('phoneNumber')}" th:errors="*{phoneNumber}"></p>-->
+<!--          </div>-->
+
+<!--          <div class="form-group">-->
+<!--            <label for="birthday">Ngày sinh</label>-->
+<!--            <input type="date" class="form-control" id="birthday" th:field="*{birthday}">-->
+<!--            <p class="text-danger" th:if="${#fields.hasErrors('birthday')}" th:errors="*{birthday}"></p>-->
+<!--          </div>-->
+<!--          <div class="form-group">-->
+<!--            <label for="address">Địa chỉ</label>-->
+<!--            <input type="text" class="form-control" id="address" th:field="*{address}">-->
+<!--            <p class="text-danger" th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></p>-->
+<!--          </div>-->
+
+<!--        </div>-->
+<!--        <div class="modal-footer">-->
+<!--          <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>-->
+<!--          <button type="submit" class="btn btn-primary">Lưu</button>-->
+<!--        </div>-->
+<!--      </form>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--</div>-->
+
+<!--<div class="modal fade" id="modalDelete">-->
+<!--  <div class="modal-dialog" role="document">-->
+<!--    <div class="modal-content">-->
+<!--      <div class="modal-header">-->
+<!--        <h5 class="modal-title">Xác nhận</h5>-->
+<!--        <button type="button" class="close" data-dismiss="modal"><span>&times;</span>-->
+<!--        </button>-->
+<!--      </div>-->
+<!--      <div class="modal-body">Bạn có chắc chắn muốn xóa không ?</div>-->
+<!--      <div class="modal-footer">-->
+<!--        <button type="button" class="btn btn-secondary" data-dismiss="modal">Không</button>-->
+<!--        <form method="post" th:action="@{/manage/student/delete}">-->
+<!--          <input type="hidden" id="idDeleteStudent" name ="idDeleteStudent"  />-->
+<!--          <button type="submit" class="btn btn-primary">Đồng ý</button>-->
+<!--        </form>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--</div>-->
+
+<!--&lt;!&ndash;   phục  v việc đổi trang thái nghỉ học &ndash;&gt;-->
+<!--<div class="modal fade" id="modalRest">-->
+<!--  <div class="modal-dialog" role="document">-->
+<!--    <div class="modal-content">-->
+<!--      <div class="modal-header">-->
+<!--        <h5 class="modal-title">Xác nhận</h5>-->
+<!--        <button type="button" class="close" data-dismiss="modal"><span>&times;</span>-->
+<!--        </button>-->
+<!--      </div>-->
+<!--      <div class="modal-body">Bạn có chắc chắn muốn cho nghỉ học không ?</div>-->
+<!--      <div class="modal-footer">-->
+<!--        <button type="button" class="btn btn-secondary" data-dismiss="modal">Không</button>-->
+<!--        <form method="post" th:action="@{/manage/student/rest}">-->
+<!--          <input type="hidden" id="idRestStudent" name ="idRestStudent"  />-->
+<!--          <button type="submit" class="btn btn-primary">Đồng ý</button>-->
+<!--        </form>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--</div>-->
+
+<!--&lt;!&ndash;   phục  v việc đổi trang thái đi học &ndash;&gt;-->
+<!--<div class="modal fade" id="modalComeback">-->
+<!--  <div class="modal-dialog" role="document">-->
+<!--    <div class="modal-content">-->
+<!--      <div class="modal-header">-->
+<!--        <h5 class="modal-title">Xác nhận</h5>-->
+<!--        <button type="button" class="close" data-dismiss="modal"><span>&times;</span>-->
+<!--        </button>-->
+<!--      </div>-->
+<!--      <div class="modal-body">Bạn có chắc chắn muốn thay đổi trạng thái cho học sinh đi học lại không ?</div>-->
+<!--      <div class="modal-footer">-->
+<!--        <button type="button" class="btn btn-secondary" data-dismiss="modal">Không</button>-->
+<!--        <form method="post" th:action="@{/manage/student/comeback}">-->
+<!--          <input type="hidden" id="idComebackStudent" name ="idComebackStudent"  />-->
+<!--          <button type="submit" class="btn btn-primary">Đồng ý</button>-->
+<!--        </form>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--</div>-->
+
+
+
+<!--<script th:inline="javascript" th:if="${formError}">-->
+<!--  $(document).ready(function() {-->
+<!--    $("#modalAddEdit").modal("show");-->
+<!--  });-->
+<!--</script>-->
+
+<!--<script th:inline="javascript">-->
+<!--  $(document).ready(function () {-->
+<!--    // Lắng nghe sự kiện click vào modal-->
+<!--    $('#modalAddEdit').on('click', function (e) {-->
+<!--      var hasErrors = $('#modalError').data("has-errors");-->
+<!--      // Kiểm tra xem sự kiện click có diễn ra trong phần nội dung modal hay không-->
+<!--      if (!$(e.target).closest('.modal-content').length) {-->
+<!--        if(hasErrors){-->
+<!--          // Nếu không, chuyển hướng đến trang account/admin-->
+<!--          window.location.href = '/manage/student';-->
+<!--        }-->
+
+<!--      }-->
+<!--    });-->
+<!--  });-->
+<!--</script>-->
+
+<!--<script>-->
+<!--  $(document).ready(function (){-->
+
+<!--    $(".add-button").click(function (){-->
+<!--      $("#id").val(0);-->
+<!--      $("#fullName").val('');-->
+<!--      $("#phoneNumber").val('');-->
+<!--      $("#birthday").val('');-->
+<!--      $("#address").val('');-->
+<!--      $("#class").val('');-->
+<!--      $("#academy_year").val('');-->
+<!--    });-->
+
+<!--    $(".edit-button").click(function (){-->
+<!--      var id = $(this).parent().data("id")-->
+<!--      var fullName = $(this).parent().data("fullname");-->
+<!--      var phoneNumber = $(this).parent().data("phonenumber");-->
+<!--      var birthday = $(this).parent().data("birthday");-->
+<!--      var address = $(this).parent().data("address");-->
+<!--      var idClass = $(this).parent().data("classroom");-->
+<!--      var academy = $(this).parent().data("academy-year");-->
+<!--      // Gán giá trị cho các trường input trong modal-->
+<!--      $("#id").val(id);-->
+<!--      $("#fullName").val(fullName);-->
+<!--      $("#phoneNumber").val(phoneNumber);-->
+<!--      $("#birthday").val(birthday);-->
+<!--      $("#address").val(address);-->
+<!--      $("#class").val(idClass);-->
+<!--      $("#academy_year").val(academy);-->
+<!--    });-->
+
+<!--    $(".delete-button").click(function (){-->
+<!--      let id = $(this).parent().data("id")-->
+<!--      $("#idDeleteStudent").val(id)-->
+<!--    })-->
+
+
+<!--    $(".rest-button").click(function (){-->
+<!--      let id = $(this).parent().data("id")-->
+<!--      $("#idRestStudent").val(id)-->
+<!--    })-->
+
+<!--    $(".comeback-button").click(function (){-->
+<!--      let id = $(this).parent().data("id")-->
+<!--      $("#idComebackStudent").val(id)-->
+<!--    })-->
+
+<!--  });-->
+
+<!--</script>-->
+
+
+
+<!--<script th:src="@{/plugins/toastr/js/toastr.min.js}"></script>-->
+<!--<script th:src="@{/plugins/toastr/js/toastr.init.js}"></script>-->
+
+
+<!--<script th:inline="javascript" th:if="${changeSuccess != null}">-->
+<!--  toastr.success("Thay đổi thành công","Thành công", {-->
+<!--    timeOut: 5e3,-->
+<!--    closeButton: !0,-->
+<!--    debug: !1,-->
+<!--    newestOnTop: !0,-->
+<!--    progressBar: !0,-->
+<!--    positionClass: "toast-top-right",-->
+<!--    preventDuplicates: !0,-->
+<!--    onclick: null,-->
+<!--    showDuration: "300",-->
+<!--    hideDuration: "1000",-->
+<!--    extendedTimeOut: "1000",-->
+<!--    showEasing: "swing",-->
+<!--    hideEasing: "linear",-->
+<!--    showMethod: "fadeIn",-->
+<!--    hideMethod: "fadeOut",-->
+<!--    tapToDismiss: !1-->
+<!--  });-->
+<!--</script>-->
+
+<!--<script th:inline="javascript" th:if="${changeFail != null}">-->
+<!--  toastr.error( "Thay đổi thất bại","Thất bại", {-->
+<!--    timeOut: 5e3,-->
+<!--    closeButton: !0,-->
+<!--    debug: !1,-->
+<!--    newestOnTop: !0,-->
+<!--    progressBar: !0,-->
+<!--    positionClass: "toast-top-right",-->
+<!--    preventDuplicates: !0,-->
+<!--    onclick: null,-->
+<!--    showDuration: "300",-->
+<!--    hideDuration: "1000",-->
+<!--    extendedTimeOut: "1000",-->
+<!--    showEasing: "swing",-->
+<!--    hideEasing: "linear",-->
+<!--    showMethod: "fadeIn",-->
+<!--    hideMethod: "fadeOut",-->
+<!--    tapToDismiss: !1-->
+<!--  });-->
+<!--</script>-->
+
+<!--**********************************
+    Scripts
+***********************************-->
+<script th:src="@{/plugins/common/common.min.js}"></script>
+<script th:src="@{/js/custom.min.js}"></script>
+<script th:src="@{/js/settings.js}"></script>
+<script th:src="@{/js/gleek.js}"></script>
+<script th:src="@{/js/styleSwitcher.js}"></script>
+
+<script th:src="@{/plugins/tables/js/jquery.dataTables.min.js}"></script>
+<script th:src="@{/plugins/tables/js/datatable/dataTables.bootstrap4.min.js}"></script>
+<script th:src="@{/plugins/tables/js/datatable-init/datatable-basic.min.js}"></script>
+
+</body>
+
+</html>

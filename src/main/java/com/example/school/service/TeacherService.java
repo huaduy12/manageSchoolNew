@@ -20,11 +20,12 @@ public interface TeacherService {
     public TeacherDto findByIdDto(int id);
     public TeacherDto findByUserIdDto(int userId);
 
-    public List<TeacherDto> getTeacherBySubject_id(int subject_id);
-
+    public Page<TeacherDto> getTeacherBySubject_id(int subject_id,int PageNo,int pageSize);
 
     public void rest(int id);
     public void comeback(int id);
 
-    public Page<TeacherDto> findPaginated(int pageNo, int pageSize);
+    public Page<TeacherDto> findPaginated(int pageNo, int pageSize,String keyword);
+
+
 }

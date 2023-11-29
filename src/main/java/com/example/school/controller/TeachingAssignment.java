@@ -11,6 +11,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -21,17 +22,20 @@ public class TeachingAssignment {
     @Autowired
     private ClassroomService classroomService;
     @GetMapping()
-    public String homeClass(Model model){
-        return findPaginated(1,model);
+    public String homeClass(Model model, @RequestParam(value = "keyword",required = false) String keyword){
+        return findPaginated(1,model,keyword);
     }
     @GetMapping("/page/{pageNo}")
     public String findPaginated(@PathVariable(value = "pageNo") int pageNo, Model model
-    ){
+    , @RequestParam(value = "keyword",required = false) String keyword){
 
         if(pageNo <= 0) return "redirect:/manage/assign";
         int pageSize = Pagination.pageSize;
-        Page<ClassroomDto> classroomDtos = classroomService.findPaginated(pageNo-1,pageSize);
-
+        Page<ClassroomDto> classroomDtos = classroomService.findPaginated(pageNo-1,pageSize,keyword);
+        if(classroomDtos.getTotalElements() != 0 && pageNo > classroomDtos.getTotalPages()){
+            return "redirect:/manage/classroom/page/1?keyword="+keyword;
+        }
+        model.addAttribute("keyword",keyword);
         model.addAttribute("pageNo",pageNo);
         model.addAttribute("pageSize",pageSize);
         model.addAttribute("classroomDtos",classroomDtos);

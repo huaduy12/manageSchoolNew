@@ -47,5 +47,5 @@ public interface StudentService {
     public List<StudentDto> getStudentByClassIdDto(int classId);
     public List<Student> getStudentByClassId(int classId);
 
-    public Page<StudentDto> findPaginated(int pageNo,int pageSize);
+    public Page<StudentDto> findPaginated(int pageNo,int pageSize,String keyword);
 }

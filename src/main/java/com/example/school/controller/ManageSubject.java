@@ -31,17 +31,18 @@ public class ManageSubject {
     private TeacherService teacherService;
 
     @GetMapping()
-    public String homeClass(Model model){
-        return findPaginated(1,model,null);
+    public String homeClass(Model model, @RequestParam(value = "keyword",required = false) String keyword){
+        return findPaginated(1,model,null,keyword);
     }
 
     @PostMapping("/save")
     public String save(@Valid @ModelAttribute("subjectDto") SubjectDto subjectDto,
                        BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes,
-                       @ModelAttribute("form") String form,@ModelAttribute("pageNo") int pageNo){
+                       @ModelAttribute("form") String form,@ModelAttribute("pageNo") int pageNo,
+                       @RequestParam(value = "keyword",required = false) String keyword){
 
         if(bindingResult.hasErrors()){
-            findPaginated(pageNo,model,subjectDto);
+            findPaginated(pageNo,model,subjectDto,keyword);
             if(!form.trim().equals("")){
                 model.addAttribute("formError","Có lỗi ở form");
             }
@@ -79,7 +80,8 @@ public class ManageSubject {
     }
 
     @GetMapping("/teacher")
-    public String teacherSubject(@RequestParam("id") String id, Model model){
+    public String teacherSubject(@RequestParam("id") String id,@RequestParam("page") int pageNo,
+                                 Model model){
         int idSubject = 0;
         try {
             idSubject = Integer.parseInt(id);
@@ -87,26 +89,31 @@ public class ManageSubject {
             e.printStackTrace();
             return "redirect:/manage/subject";
         }
-        List<TeacherDto> teacherDtos = null;
-        teacherDtos = teacherService.getTeacherBySubject_id(idSubject);
+        if(pageNo <= 0) return "redirect:/manage/subject";
+        int pageSize = Pagination.pageSize;
+        Page<TeacherDto> teacherDtos = null;
+        teacherDtos = teacherService.getTeacherBySubject_id(idSubject,pageNo-1,pageSize);
+        model.addAttribute("pageNo",pageNo);
+        model.addAttribute("pageSize",pageSize);
+        model.addAttribute("id",idSubject);
         model.addAttribute("teachersDto",teacherDtos);
 
-        FormManageTeacher formManageTeacher = new FormManageTeacher();
-        formManageTeacher.setId(0);
-        model.addAttribute("formManageTeacher",formManageTeacher);
-
-        return "manage_teacher";
+        return "subject/teacher_subject";
     }
 
     @GetMapping("/page/{pageNo}")
     public String findPaginated(@PathVariable(value = "pageNo") int pageNo,Model model,
-                                SubjectDto subjectDto
+                                SubjectDto subjectDto,
+                                @RequestParam(value = "keyword",required = false) String keyword
     ){
 
         if(pageNo <= 0) return "redirect:/manage/subject";
         int pageSize = Pagination.pageSize;
-        Page<SubjectDto> subjectDtos = subjectService.findPaginated(pageNo-1,pageSize);
-
+        Page<SubjectDto> subjectDtos = subjectService.findPaginated(pageNo-1,pageSize,keyword);
+        if(subjectDtos.getTotalElements() != 0 && pageNo > subjectDtos.getTotalPages()){
+            return "redirect:/manage/classroom/page/1?keyword="+keyword;
+        }
+        model.addAttribute("keyword",keyword);
         model.addAttribute("pageNo",pageNo);
         model.addAttribute("pageSize",pageSize);
         model.addAttribute("subjectDtos",subjectDtos);

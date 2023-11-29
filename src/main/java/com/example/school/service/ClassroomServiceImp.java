@@ -95,12 +95,13 @@ public class ClassroomServiceImp implements ClassroomService{
     }
 
     @Override
-
-    public Page<ClassroomDto> findPaginated(int pageNo, int pageSize) {
+    public Page<ClassroomDto> findPaginated(int pageNo, int pageSize,String keyword) {
 
         Sort sort = Sort.by(Sort.Order.desc("id"));
         Pageable pageable = PageRequest.of(pageNo,pageSize,sort);
-        Page<Classroom> classrooms = classroomRepository.findAll(pageable);
+        if(keyword == null) keyword = " ";
+        Page<Classroom> classrooms = classroomRepository.findAll(keyword,pageable);
+
 
         List<ClassroomDto> classroomDtos = null;
         if(classrooms != null){

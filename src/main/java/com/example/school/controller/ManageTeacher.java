@@ -13,6 +13,7 @@ import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -22,7 +23,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.List;
 
 @Controller
-@RequestMapping("/manage/teacher")
+@RequestMapping(value = "/manage/teacher")
 public class ManageTeacher {
 
     @Autowired
@@ -35,17 +36,17 @@ public class ManageTeacher {
     private ModelMapper modelMapper;
 
     @GetMapping()
-    public String homeTeacher(Model model){
-       return findPaginated(1,model,null);
+    public String homeTeacher(Model model,@RequestParam(value = "keyword",required = false) String keyword){
+       return findPaginated(1,model,null,keyword);
     }
 
     @PostMapping("/save")
     public String save(@Valid @ModelAttribute("formManageTeacher") FormManageTeacher formManageTeacher,
                        BindingResult bindingResult,Model model, RedirectAttributes redirectAttributes,
-                       @ModelAttribute("form") String form,@ModelAttribute("pageNo") int pageNo){
-
+                       @ModelAttribute("form") String form,@ModelAttribute("pageNo") int pageNo,
+                       @RequestParam(value = "keyword",required = false) String keyword){
         if(bindingResult.hasErrors()){
-            findPaginated(pageNo,model,formManageTeacher);
+            findPaginated(pageNo,model,formManageTeacher,keyword);
             if(!form.trim().equals("")){
                 model.addAttribute("formError","Có lỗi ở form");
             }
@@ -71,7 +72,6 @@ public class ManageTeacher {
         teacherService.comeback(idComeback);
         return "redirect:/manage/teacher";
     }
-
 
     @GetMapping("/classDetail")
     public String showClassStudy(@RequestParam("id") String id_teacher,@RequestParam("role") String role_id, Model model){
@@ -102,16 +102,19 @@ public class ManageTeacher {
 
     @GetMapping("/page/{pageNo}")
     public String findPaginated(@PathVariable(value = "pageNo") int pageNo,Model model,
-                                FormManageTeacher formManageTeacher
-    ){
-
+                                FormManageTeacher formManageTeacher,@RequestParam(value = "keyword",required = false) String keyword
+                                ){
         if(pageNo <= 0) return "redirect:/manage/teacher";
         int pageSize = Pagination.pageSize;
-        Page<TeacherDto> teacherDtos = teacherService.findPaginated(pageNo-1,pageSize);
+        Page<TeacherDto> teacherDtos = teacherService.findPaginated(pageNo-1,pageSize,keyword);
 
+        if(teacherDtos.getTotalPages() != 0 && pageNo > teacherDtos.getTotalPages()){
+            return "redirect:/manage/teacher/page/1?keyword="+keyword;
+        }
         model.addAttribute("pageNo",pageNo);
         model.addAttribute("pageSize",pageSize);
         model.addAttribute("teacherDtos",teacherDtos);
+        model.addAttribute("keyword",keyword);
 
         // thông tin các lớp đang còn học để phục vụ cho form add, edit
         if(formManageTeacher == null){
@@ -121,8 +124,6 @@ public class ManageTeacher {
         }else {
             model.addAttribute("formManageTeacher",formManageTeacher);
         }
-
-
         return "manage_teacher";
     }
 

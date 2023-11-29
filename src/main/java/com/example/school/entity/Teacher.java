@@ -80,7 +80,7 @@ public class Teacher implements Serializable {
                 ", status=" + status +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
-//                ", user=" + user +
+   //             ", user=" + user.getUsername() +
 //                ", teacher_classes=" + teacher_classes +
                 '}';
     }

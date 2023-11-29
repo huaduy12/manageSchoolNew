@@ -44,20 +44,23 @@ public class ManageStudent {
     private ScoreService scoreService;
 
     @GetMapping()
-    public String homeStudent(Model model){
-        return findPaginated(1,model,null);
+    public String homeStudent(Model model,@RequestParam(value = "keyword",required = false) String keyword){
+        return findPaginated(1,model,null,keyword);
     }
 
     @GetMapping("/page/{pageNo}")
-    public String findPaginated(@PathVariable(value = "pageNo") int pageNo,Model model,FormStudent formStudent){
+    public String findPaginated(@PathVariable(value = "pageNo") int pageNo,Model model,FormStudent formStudent,
+                                @RequestParam(value = "keyword",required = false) String keyword){
 
         if(pageNo <= 0) return "redirect:/manage/student";
         int pageSize = Pagination.pageSize;
-        Page<StudentDto> studentDtos = studentService.findPaginated(pageNo-1,pageSize);
-
+        Page<StudentDto> studentDtos = studentService.findPaginated(pageNo-1,pageSize,keyword);
+        if(studentDtos.getTotalElements() != 0 && pageNo > studentDtos.getTotalPages()){
+            return "redirect:/manage/student/page/1?keyword="+keyword;
+        }
+        model.addAttribute("keyword",keyword);
         model.addAttribute("pageNo",pageNo);
         model.addAttribute("pageSize",pageSize);
-
         model.addAttribute("studentDtos",studentDtos);
         // thông tin các lớp đang còn học để phục vụ cho form add, edit
         List<ClassroomDto> classroomsDto = classroomService.getClassRoomStudying();
@@ -78,11 +81,12 @@ public class ManageStudent {
     public String save(@Valid @ModelAttribute("formStudent") FormStudent formStudent,
                        BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes,
                        @ModelAttribute("form") String form,
-                       @ModelAttribute("pageNo") int pageNo){
+                       @ModelAttribute("pageNo") int pageNo
+                        ,@RequestParam(value = "keyword",required = false) String keyword){
 
 
         if(bindingResult.hasErrors()){
-            findPaginated(pageNo,model,formStudent);
+            findPaginated(pageNo,model,formStudent,keyword);
             if(!form.trim().equals("")){
                 model.addAttribute("formError","Có lỗi ở form");
             }

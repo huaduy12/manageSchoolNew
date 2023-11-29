@@ -33,8 +33,8 @@ public class AccountTeacherController {
     ModelMapper modelMapper;
 
     @GetMapping()
-    public String homeTeacher(Model model){
-       return findPaginated(1,model,null);
+    public String homeTeacher(Model model, @RequestParam(value = "keyword",required = false) String keyword){
+       return findPaginated(1,model,null,keyword);
     }
 
     @PostMapping("/save")
@@ -45,25 +45,26 @@ public class AccountTeacherController {
                        @ModelAttribute("formEdit") String formEdit,
                        @ModelAttribute("idTeacher") String idTeacher,
                        RedirectAttributes redirectAttributes,
-                       @ModelAttribute("pageNo") int pageNo){
+                       @ModelAttribute("pageNo") int pageNo,
+                       @RequestParam(value = "keyword",required = false) String keyword){
 
         UserDto userExist = userTeacherService.getUserExist(userForm.getUsername(),usernameOrigin);
         if(userExist != null){
             result.addError(new FieldError("userForm","username","Username đã tồn tại"));
         }
         if(result.hasErrors()){
-            findPaginated(pageNo,model,userForm);
+            findPaginated(pageNo,model,userForm,keyword);
             if(formAdd != null && !formAdd.trim().equals("")){
-                System.out.println("FormAdd: " + formAdd);
+
                 model.addAttribute("errorFormAdd","Có lỗi xảy ra");
             }
             if(formEdit != null && !formEdit.trim().equals("")){
-                System.out.println("FormEdit: " + formEdit);
+
                 model.addAttribute("errorFormEdit","Có lỗi xảy ra");
             }
             if(idTeacher != null && !idTeacher.trim().equals("") && !idTeacher.trim().equals("0")){
                 if(userExist != null){
-                    System.out.println("username đã tồn tại");
+
                     redirectAttributes.addFlashAttribute("errorUsernameExist","Username đã tồn tại");
                 }else {
                     redirectAttributes.addFlashAttribute("errorUsername","Vui lòng nhập ít nhất 8 ký tự");
@@ -140,12 +141,17 @@ public class AccountTeacherController {
 
     @GetMapping("/page/{pageNo}")
     public String findPaginated(@PathVariable(value = "pageNo") int pageNo, Model model,
-                                CreatingUserForm creatingUserForm){
+                                CreatingUserForm creatingUserForm,
+                                @RequestParam(value = "keyword",required = false) String keyword){
 
         if(pageNo <= 0) return "redirect:/account/teacher";
         int pageSize = Pagination.pageSize;
-        Page<UserDto> userDtos = userTeacherService.findPaginated(pageNo-1,pageSize);
-
+        if(keyword == null) keyword = " ";
+        Page<UserDto> userDtos = userTeacherService.findPaginated(pageNo-1,pageSize,keyword);
+        if(userDtos.getTotalElements() != 0 && pageNo > userDtos.getTotalPages()){
+            return "redirect:/account/teacher/page/1?keyword="+keyword;
+        }
+        model.addAttribute("keyword",keyword);
         model.addAttribute("pageNo",pageNo);
         model.addAttribute("pageSize",pageSize);
         model.addAttribute("userDtos",userDtos);

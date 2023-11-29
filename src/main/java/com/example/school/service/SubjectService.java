@@ -21,5 +21,5 @@ public interface SubjectService {
 
     public List<Teacher_classDto> getSubjectsByClass_id(int class_id);
 
-    public Page<SubjectDto> findPaginated(int pageNo, int pageSize);
+    public Page<SubjectDto> findPaginated(int pageNo, int pageSize,String keyword);
 }

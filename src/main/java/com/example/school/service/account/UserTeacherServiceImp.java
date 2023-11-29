@@ -170,12 +170,12 @@ public class UserTeacherServiceImp implements UserTeacherService{
     }
 
     @Override
-    public Page<UserDto> findPaginated(int pageNo, int pageSize) {
+    public Page<UserDto> findPaginated(int pageNo, int pageSize,String keyword) {
         Role role = roleRepository.findById(2);
-
         Sort sort = Sort.by(Sort.Order.desc("id"));
         Pageable pageable = PageRequest.of(pageNo,pageSize,sort);
-        Page<User> listTeacher = userRepository.findManagersWithoutAdmin(pageable);
+        if(keyword == null) keyword = " ";
+        Page<User> listTeacher = userRepository.findManagersWithoutAdmin(keyword,pageable);
 
         List<UserDto> userDtos = null;
         if(listTeacher != null){

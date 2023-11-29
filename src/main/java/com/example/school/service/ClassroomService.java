@@ -20,6 +20,6 @@ public interface ClassroomService {
     public void open(int idClass);
     public Classroom findById(int id);
 
-    public Page<ClassroomDto> findPaginated(int pageNo, int pageSize);
+    public Page<ClassroomDto> findPaginated(int pageNo, int pageSize,String keyword);
 
 }
