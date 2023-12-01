@@ -280,7 +280,8 @@
 
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                <button th:if="${#fields.hasAnyErrors()}" type="button" class="btn btn-secondary" onclick="window.location.href='/manage/class'">Đóng</button>
+                <button th:unless="${#fields.hasAnyErrors()}" type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
                 <button type="submit" class="btn btn-primary">Lưu</button>
             </div>
         </form>

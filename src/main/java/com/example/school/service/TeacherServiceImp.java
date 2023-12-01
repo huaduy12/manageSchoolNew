@@ -66,7 +66,8 @@ public Teacher save(FormManageTeacher formManageTeacher) {
         teacher.setCreatedAt(CopyTeacher.getCreatedAt());
     }
     if(teacher != null){
-         System.out.println(teacher);
+         teacher.setFullName(teacher.getFullName().trim());
+         teacher.setAddress(teacher.getAddress().trim());
          teacher.setStatus(true);
          return teacherRepository.save(teacher);
      }

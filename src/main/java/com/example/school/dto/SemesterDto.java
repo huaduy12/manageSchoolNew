@@ -12,6 +12,6 @@ import lombok.NoArgsConstructor;
 public class SemesterDto {
     private int id;
 
-    @NotBlank(message = "Tên học kỳ không để trống")
+    @NotBlank(message = "{semester.name}")
     private String name;
 }

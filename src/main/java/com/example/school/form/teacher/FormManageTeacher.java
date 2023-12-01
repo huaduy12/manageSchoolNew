@@ -19,26 +19,26 @@ public class FormManageTeacher {
 
     private int id;
 
-    @NotBlank(message = "Vui lòng nhập tên")
+    @NotBlank(message = "{teacher.fullName}")
     private String fullName;
 
-    @NotNull(message = "Vui lòng chọn vai trò")
+    @NotNull(message = "{teacher.role}")
     private RoleTeacher role;
 
-    @Pattern(regexp = "^[0-9]{10}$", message = "Vui lòng nhập số điện thoại")
+    @Pattern(regexp = "^[0-9]{10}$", message = "{teacher.phoneNumber}")
     private String phoneNumber;
 
-    @NotNull(message = "Ngày sinh không được để trống")
-    @Past(message = "Ngày sinh phải là ngày trong quá khứ")
+    @NotNull(message = "{teacher.birthDay}")
+    @Past(message = "{teacher.birthDayPast}")
     @Temporal(TemporalType.DATE)
     @DateTimeFormat(pattern = "yyyy-MM-dd")  // lưu ý khi lưu đinh dạng nếu để dd/MM/yyyy thì sẽ b lỗi
     private Date birthday;
 
-    @NotBlank(message = "Vui lòng nhập địa chỉ")
+    @NotBlank(message = "{teacher.address}")
     private String address;
 
-    @Email(message = "Vui lòng nhập địa chỉ email")
-    @NotBlank(message = "Vui lòng nhập địa chỉ email")
+    @Email(message = "{teacher.email}")
+    @NotBlank(message = "{teacher.email}")
     private String email;
 
     private User user;

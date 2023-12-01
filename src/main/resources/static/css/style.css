@@ -14698,5 +14698,10 @@ html[dir="rtl"] [direction="rtl"][data-sidebar-style="compact"]:not([data-layout
     background-color: #1b2b42; }
     [data-theme-version="dark"] .footer .copyright p {
       color: #fff; }
-
 /*# sourceMappingURL=style.css.map */
+
+
+.dataTables_filter input{
+  border: 1px solid #ced4da !important;
+  font-size: 16px;
+}

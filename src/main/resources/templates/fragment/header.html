@@ -188,7 +188,7 @@
       </li>
 
       <li sec:authorize="!hasRole('ROLE_ADMIN') and hasRole('ROLE_MANAGER') and hasRole('ROLE_USER')">
-        <a th:href="@{/teacher/score}" aria-expanded="false">
+        <a th:href="@{/teacher/score/1}" aria-expanded="false">
           <i class="fa fa-star-half" aria-hidden="true"></i><span class="nav-text">Cập nhập điểm</span>
         </a>
       </li>

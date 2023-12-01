@@ -244,7 +244,7 @@
 
                 </div>
                 <div class="modal-footer">
-                    <button th:if="${param.idTeacher != null and not #strings.contains(param.idTeacher,'0')}" type="button" class="btn btn-secondary" onclick="window.location.href='/manage/teacher'" >Đóng</button>
+                    <button th:if="${param.idTeacher != null and not #strings.contains(param.idTeacher,'') and not #strings.contains(param.idTeacher,'0')}" type="button" class="btn btn-secondary" onclick="window.location.href='/manage/teacher'" >Đóng</button>
                     <button th:if="${#fields.hasAnyErrors() == true}" type="button" class="btn btn-secondary" onclick="window.location.href='/account/teacher'" >Đóng</button>
                     <button th:if="${#fields.hasAnyErrors() == false and param.idTeacher == null} "  type="button" class="btn btn-secondary" data-dismiss="modal" >Đóng</button>
                     <button type="submit" class="btn btn-primary">Lưu</button>

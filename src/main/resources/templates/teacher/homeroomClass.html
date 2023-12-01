@@ -88,10 +88,21 @@
                             <h4 th:if="${confirmHomeroom}" class="card-title">Những lớp học chủ nhiệm</h4>
                             <h4 th:if="${confirmStuding}" class="card-title">Những lớp học bộ môn </h4>
 
+                            <div class="row">
+                                <div class="col-8">
 
+                                </div>
+                                <div class="col-4">
+                                    <form method="get" style="display: flex;width: 100%">
+                                        <input type="search" name="keyword" th:value="${keyword}" class="form-control" style="border: 2px solid #ced4da;" placeholder="Tìm kiếm" aria-label="Tìm kiếm">
+                                        <button type="submit" id="buttonSearch" class="btn btn-danger" style="border-radius: 0px">
+                                            <i class="fa fa-search" aria-hidden="true"></i> </button>
+                                    </form>
+                                </div>
+                            </div>
                             <div class="table-responsive">
 
-                                <table class="table table-striped table-bordered zero-configuration">
+                                <table class="table table-bordered verticle-middle header-border table-hover">
 
                                     <thead>
                                     <tr>
@@ -103,7 +114,7 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <tr th:each="classroom : ${classroomDtos}">
+                                    <tr th:each="classroom : ${classroomDtos.getContent()}">
                                         <td th:text="${classroom.name}"></td>
                                         <td th:text="${classroom.academic_year}"></td>
                                         <td th:text="${classroom.note}"></td>
@@ -124,6 +135,51 @@
 
                                 </table>
                             </div>
+                            <!-- start pagination   -->
+                            <div th:if="${classroomDtos.getTotalPages() >0}">
+                                <!-- start total element  -->
+                                <div th:if="${(pageNo -1) * pageSize +1} < ${classroomDtos.getTotalElements()}" class="text-left" th:text="${(pageNo -1) * pageSize +1} + ' - ' + (${pageNo*pageSize} > ${classroomDtos.getTotalElements()} ? ${classroomDtos.getTotalElements()} : ${pageNo*pageSize} ) + ' of ' + ${classroomDtos.getTotalElements()}"></div>
+                                <div th:if="${(pageNo -1) * pageSize +1} == ${classroomDtos.getTotalElements()}" class="text-left" th:text="(${pageNo*pageSize} > ${classroomDtos.getTotalElements()} ? ${classroomDtos.getTotalElements()} : ${pageNo*pageSize} ) + ' of ' + ${classroomDtos.getTotalElements()}"></div>
+                                <!-- end total element  -->
+
+                                <div class="bootstrap-pagination">
+                                    <nav  th:if="${classroomDtos.getTotalPages() >1}">
+                                        <ul class="pagination justify-content-end">
+
+                                            <li class="page-item " th:if="${pageNo > 1}"><a class="page-link" th:href="'/teacher/page/' + (${pageNo}-1)+'?role=' + ${confirmHomeroom==true ? '0':'1'}+ ${keyword != null ? '&keyword=' + keyword : ''}" tabindex="-1">Previous</a>
+                                            </li>
+                                            <!-- print pages smaller than 6  -->
+                                            <li th:if="${pageNo < 6}" class="page-item" th:each="i : ${#numbers.sequence(1,classroomDtos.getTotalPages())}">
+                                                <a class="page-link" th:if="${pageNo != i}" th:href="@{'/teacher/page/' + ${i} +'?role=' + ${confirmHomeroom==true ? '0':'1'}+ ${keyword != null ? '&keyword=' + keyword : ''}}" th:text="${i}"></a>
+                                                <a class="page-link" style="color: #000" th:unless="${pageNo != i}" th:text="${i}"></a>
+                                            </li>
+
+                                            <!-- print pages larger than or equal to 6  -->
+                                            <li th:if="${pageNo >= 6 }" class="page-item">
+                                                <a class="page-link"  th:href="@{'/teacher/page/1'+'?role='+ ${confirmHomeroom==true ? '0':'1'}+ ${keyword != null ? '&keyword=' + keyword : ''} }" th:text="'1'"></a>
+                                            </li>
+                                            <li th:if="${pageNo >= 6  }" class="page-item">
+                                                <a class="page-link" style="color: #000" th:text="'...'"></a>
+                                            </li>
+
+                                            <li th:if="${pageNo >= 6 and pageNo < classroomDtos.getTotalPages()  }" class="page-item" th:each="i : ${#numbers.sequence((pageNo)-1,(pageNo)+1)}">
+                                                <a class="page-link" th:if="${pageNo != i}" th:href="@{'/teacher/page/' + ${i} +'?role='+ ${confirmHomeroom==true ?'0':'1'}+ ${keyword != null ? '&keyword=' + keyword : ''}}" th:text="${i}"></a>
+                                                <a class="page-link" style="color: #000" th:unless="${pageNo != i}" th:text="${i}"></a>
+                                            </li>
+                                            <!-- conditions print last page  -->
+                                            <li th:if="${pageNo >= 6 and pageNo == classroomDtos.getTotalPages()  }" class="page-item" th:each="i : ${#numbers.sequence((pageNo)-2,(pageNo))}">
+                                                <a class="page-link" th:if="${pageNo != i}" th:href="@{'/teacher/page/' + ${i} +'?role='+ ${confirmHomeroom==true ?'0':'1'}+ ${keyword != null ? '&keyword=' + keyword : ''}}" th:text="${i}"></a>
+                                                <a class="page-link" style="color: #000" th:unless="${pageNo != i}" th:text="${i}"></a>
+                                            </li>
+                                            <li class="page-item " th:if="${pageNo < classroomDtos.getTotalPages()}"><a class="page-link" th:href="'/teacher/page/' + (${pageNo}+1) +'?role='+ ${confirmHomeroom==true ?'0':'1'}+ ${keyword != null ? '&keyword=' + keyword : ''}" tabindex="-1">Next</a>
+
+                                            </li>
+                                        </ul>
+                                    </nav>
+                                </div>
+                            </div>
+                            <!-- end pagination   -->
+
                         </div>
                     </div>
                 </div>
@@ -149,173 +205,96 @@
     Main wrapper end
 ***********************************-->
 
-<!-- Modal -->
-<div class="modal fade" id="modalAddEdit" tabindex="-1" role="dialog" aria-labelledby="modelAddEdit" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modelAddEdit">Lớp học</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <form method="post", th:action="@{/manage/class/save}" th:object="${formClassroom}">
-                <div class="modal-body" id ="modalError" th:data-has-errors="${#fields.hasErrors()}">
-                    <input type="hidden" id="id" th:field="*{id}">
-                    <input type="hidden"  name="form" value="form">
-                    <div class="form-group">
-                        <label for="nameClass">Tên lớp học</label>
-                        <input type="text" class="form-control" id="nameClass" th:field="*{name}">
-                        <p class="text-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></p>
-                    </div>
-                    <div class="form-group">
-                        <label for="academy_year">Niên khóa</label>
-                        <input type="text" class="form-control" id="academy_year" th:field="*{academic_year}">
-                        <p class="text-danger" th:if="${#fields.hasErrors('academic_year')}" th:errors="*{academic_year}"></p>
-                    </div>
+<!--&lt;!&ndash; Modal &ndash;&gt;-->
+<!--<div class="modal fade" id="modalAddEdit" tabindex="-1" role="dialog" aria-labelledby="modelAddEdit" aria-hidden="true">-->
+<!--    <div class="modal-dialog" role="document">-->
+<!--        <div class="modal-content">-->
+<!--            <div class="modal-header">-->
+<!--                <h5 class="modal-title" id="modelAddEdit">Lớp học</h5>-->
+<!--                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>-->
+<!--                </button>-->
+<!--            </div>-->
+<!--            <form method="post", th:action="@{/manage/class/save}" th:object="${formClassroom}">-->
+<!--                <div class="modal-body" id ="modalError" th:data-has-errors="${#fields.hasErrors()}">-->
+<!--                    <input type="hidden" id="id" th:field="*{id}">-->
+<!--                    <input type="hidden"  name="form" value="form">-->
+<!--                    <div class="form-group">-->
+<!--                        <label for="nameClass">Tên lớp học</label>-->
+<!--                        <input type="text" class="form-control" id="nameClass" th:field="*{name}">-->
+<!--                        <p class="text-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></p>-->
+<!--                    </div>-->
+<!--                    <div class="form-group">-->
+<!--                        <label for="academy_year">Niên khóa</label>-->
+<!--                        <input type="text" class="form-control" id="academy_year" th:field="*{academic_year}">-->
+<!--                        <p class="text-danger" th:if="${#fields.hasErrors('academic_year')}" th:errors="*{academic_year}"></p>-->
+<!--                    </div>-->
 
-                    <div class="form-group">
-                        <label for="note">Ghi chú</label>
-                        <!--                    <input type="text" class="form-control" id="note" th:field="*{note}">-->
-                        <textarea class="form-control" style="height: 100px" id="note" th:field="*{note}"> </textarea>
-                        <p class="text-danger" th:if="${#fields.hasErrors('note')}" th:errors="*{note}"></p>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button th:if="${#fields.hasAnyErrors()}" type="button" class="btn btn-secondary" onclick="window.location.href='/manage/class'">Đóng</button>
-                    <button th:unless="${#fields.hasAnyErrors()}" type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
-                    <button type="submit" class="btn btn-primary">Lưu</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+<!--                    <div class="form-group">-->
+<!--                        <label for="note">Ghi chú</label>-->
+<!--                        &lt;!&ndash;                    <input type="text" class="form-control" id="note" th:field="*{note}">&ndash;&gt;-->
+<!--                        <textarea class="form-control" style="height: 100px" id="note" th:field="*{note}"> </textarea>-->
+<!--                        <p class="text-danger" th:if="${#fields.hasErrors('note')}" th:errors="*{note}"></p>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--                <div class="modal-footer">-->
+<!--                    <button th:if="${#fields.hasAnyErrors()}" type="button" class="btn btn-secondary" onclick="window.location.href='/manage/class'">Đóng</button>-->
+<!--                    <button th:unless="${#fields.hasAnyErrors()}" type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>-->
+<!--                    <button type="submit" class="btn btn-primary">Lưu</button>-->
+<!--                </div>-->
+<!--            </form>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
 
-<div class="modal fade" id="modalDelete">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Xác nhận</h5>
-                <button type="button" class="close" data-dismiss="modal"><span>&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">Bạn có chắc chắn muốn xóa không ?</div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Không</button>
-                <form method="post" th:action="@{/manage/class/delete}">
-                    <input type="hidden" id="id-delete" name="idDelete"/>
-                    <button type="submit" class="btn btn-primary">Đồng ý</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
+<!--<script th:inline="javascript" th:if="${formError}">-->
+<!--    $(document).ready(function() {-->
+<!--        $("#modalAddEdit").modal("show");-->
+<!--    });-->
+<!--</script>-->
 
-<div class="modal fade" id="modalBlock">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Xác nhận</h5>
-                <button type="button" class="close" data-dismiss="modal"><span>&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">Bạn có chắc chắn muốn cho khóa lớp học không ?</div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Không</button>
-                <form method="post" th:action="@{/manage/class/block}">
-                    <input type="hidden" id="id-block" name="idBlock"/>
-                    <button type="submit" class="btn btn-primary">Đồng ý</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
+<!--<script th:inline="javascript">-->
+<!--    $(document).ready(function () {-->
+<!--        // Lắng nghe sự kiện click vào modal-->
+<!--        $('#modalAddEdit').on('click', function (e) {-->
+<!--            var hasErrors = $('#modalError').data("has-errors");-->
+<!--            // Kiểm tra xem sự kiện click có diễn ra trong phần nội dung modal hay không-->
+<!--            if (!$(e.target).closest('.modal-content').length) {-->
+<!--                if(hasErrors){-->
+<!--                    // Nếu không, chuyển hướng đến trang account/admin-->
+<!--                    window.location.href = '/manage/class';-->
+<!--                }-->
 
-<div class="modal fade" id="modalOpen">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Xác nhận</h5>
-                <button type="button" class="close" data-dismiss="modal"><span>&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">Bạn có chắc chắn muốn mở khóa lại lớp học không ?</div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Không</button>
-                <form method="post" th:action="@{/manage/class/open}">
-                    <input type="hidden" id="id-open" name="idOpen"/>
-                    <button type="submit" class="btn btn-primary">Đồng ý</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
+<!--            }-->
+<!--        });-->
+<!--    });-->
+<!--</script>-->
 
+<!--<script>-->
+<!--    $(document).ready(function (){-->
 
+<!--        $(".add-button").click(function (){-->
+<!--            $("#nameClass").val('');-->
+<!--            $("#academy_year").val('');-->
+<!--            $("#note").val('');-->
 
-<script th:inline="javascript" th:if="${formError}">
-    $(document).ready(function() {
-        $("#modalAddEdit").modal("show");
-    });
-</script>
+<!--        });-->
 
-<script th:inline="javascript">
-    $(document).ready(function () {
-        // Lắng nghe sự kiện click vào modal
-        $('#modalAddEdit').on('click', function (e) {
-            var hasErrors = $('#modalError').data("has-errors");
-            // Kiểm tra xem sự kiện click có diễn ra trong phần nội dung modal hay không
-            if (!$(e.target).closest('.modal-content').length) {
-                if(hasErrors){
-                    // Nếu không, chuyển hướng đến trang account/admin
-                    window.location.href = '/manage/class';
-                }
+<!--        $(".edit-button").click(function (){-->
+<!--            var id = $(this).parent().data("id")-->
+<!--            var name = $(this).parent().data("name");-->
+<!--            var year = $(this).parent().data("year");-->
+<!--            var note = $(this).parent().data("note");-->
 
-            }
-        });
-    });
-</script>
+<!--            // Gán giá trị cho các trường input trong modal-->
+<!--            $("#id").val(id);-->
+<!--            $("#nameClass").val(name);-->
+<!--            $("#academy_year").val(year);-->
+<!--            $("#note").val(note);-->
+<!--        });-->
 
-<script>
-    $(document).ready(function (){
+<!--    });-->
 
-        $(".add-button").click(function (){
-            $("#nameClass").val('');
-            $("#academy_year").val('');
-            $("#note").val('');
-
-        });
-
-        $(".edit-button").click(function (){
-            var id = $(this).parent().data("id")
-            var name = $(this).parent().data("name");
-            var year = $(this).parent().data("year");
-            var note = $(this).parent().data("note");
-
-            // Gán giá trị cho các trường input trong modal
-            $("#id").val(id);
-            $("#nameClass").val(name);
-            $("#academy_year").val(year);
-            $("#note").val(note);
-        });
-
-        $(".delete-button").click(function (){
-            let id = $(this).parent().data("id")
-            $("#id-delete").val(id)
-        })
-
-        $(".block-button").click(function (){
-            let id = $(this).parent().data("id")
-            $("#id-block").val(id)
-        })
-
-        $(".open-button").click(function (){
-            let id = $(this).parent().data("id")
-            $("#id-open").val(id)
-        })
-
-    });
-
-</script>
+<!--</script>-->
 
 
 <script th:src="@{/plugins/toastr/js/toastr.min.js}"></script>

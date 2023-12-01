@@ -247,7 +247,8 @@
 
                 </div>
                 <div class="modal-footer">
-                    <button th:if="${param.idStudent != null and not #strings.contains(param.idStudent,'0')}" type="button" class="btn btn-secondary" onclick="window.location.href='/manage/student'" >Đóng</button>
+
+                    <button th:if="${param.idStudent != null and not #strings.contains(param.idStudent,'')  and not #strings.contains(param.idStudent,'0')}" type="button" class="btn btn-secondary" onclick="window.location.href='/manage/student'" >Đóng</button>
                     <button th:if="${#fields.hasAnyErrors() == true}" type="button" class="btn btn-secondary" onclick="window.location.href='/account/student'" >Đóng</button>
                     <button th:if="${#fields.hasAnyErrors() == false and param.idStudent == null} "  type="button" class="btn btn-secondary" data-dismiss="modal" >Đóng</button>
                     <button type="submit" class="btn btn-primary">Lưu</button>
@@ -408,6 +409,26 @@
 
 <script th:inline="javascript" th:if="${changeSuccess != null}">
     toastr.success("Thay đổi thành công", "Thành công", {
+        timeOut: 5e3,
+        closeButton: !0,
+        debug: !1,
+        newestOnTop: !0,
+        progressBar: !0,
+        positionClass: "toast-top-right",
+        preventDuplicates: !0,
+        onclick: null,
+        showDuration: "300",
+        hideDuration: "1000",
+        extendedTimeOut: "1000",
+        showEasing: "swing",
+        hideEasing: "linear",
+        showMethod: "fadeIn",
+        hideMethod: "fadeOut",
+        tapToDismiss: !1
+    });
+</script>
+<script th:inline="javascript" th:if="${changeSuccessPassword != null}">
+    toastr.success("Mật khẩu đã được reset về username + 123", "Thành công", {
         timeOut: 5e3,
         closeButton: !0,
         debug: !1,

@@ -17,10 +17,10 @@ public class FormClassroom {
 
     private int id;
 
-    @NotBlank(message = "Vui lòng nhập tên lớp")
+    @NotBlank(message = "{classroom.NotBlank}")
     private String name;
 
-    @Length(min = 9,max = 12,message = "Vui lòng nhập đúng phạm vị cho phép")
+    @Length(min = 9,max = 12,message = "{classroom.Length}")
     private String academic_year;
 
 

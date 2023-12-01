@@ -113,7 +113,7 @@ public class AccountStudentController {
     public String resetUser(@ModelAttribute("idUserReset") int idUserReset,
                             RedirectAttributes redirectAttributes){
         User user =  userStudentService.resetPassword(idUserReset);
-        redirectAttributes.addFlashAttribute("changeSuccess","Reset thành công");
+        redirectAttributes.addFlashAttribute("changeSuccessPassword","Reset thành công");
         return "redirect:/account/student";
     }
 

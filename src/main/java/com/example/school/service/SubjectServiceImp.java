@@ -50,6 +50,7 @@ public class SubjectServiceImp implements SubjectService{
         if(subjectDto != null){
             subjectDto.setStatus(true);
             subject = modelMapper.map(subjectDto,Subject.class);
+            subject.setName(subject.getName().trim());
             subjectRepository.save(subject);
             return true;
         }

@@ -15,30 +15,24 @@ import org.hibernate.validator.constraints.Range;
 @NoArgsConstructor
 public class ScoreDto {
     private int id;
-
     private School_yearDto school_year;
-
 
     private SemesterDto semester;
 
-
-    @DecimalMin(value = "0", inclusive = true, message = "Điểm phải lớn hơn hoặc bằng 0")
-    @DecimalMax(value = "10", inclusive = true, message = "Điểm phải nhỏ hơn hoặc bằng 10")
+    @DecimalMin(value = "0", inclusive = true, message = "{score.minScore}")
+    @DecimalMax(value = "10", inclusive = true, message = "{score.maxScore}")
     private Float oval_score;
 
-
-    @DecimalMin(value = "0", inclusive = true, message = "Điểm phải lớn hơn hoặc bằng 0")
-    @DecimalMax(value = "10", inclusive = true, message = "Điểm phải nhỏ hơn hoặc bằng 10")
+    @DecimalMin(value = "0", inclusive = true, message = "{score.minScore}")
+    @DecimalMax(value = "10", inclusive = true, message = "{score.maxScore}")
     private Float score_15;
 
-
-    @DecimalMin(value = "0", inclusive = true, message = "Điểm phải lớn hơn hoặc bằng 0")
-    @DecimalMax(value = "10", inclusive = true, message = "Điểm phải nhỏ hơn hoặc bằng 10")
+    @DecimalMin(value = "0", inclusive = true, message = "{score.minScore}")
+    @DecimalMax(value = "10", inclusive = true, message = "{score.maxScore}")
     private Float score_1_period;
 
-
-    @DecimalMin(value = "0", inclusive = true, message = "Điểm phải lớn hơn hoặc bằng 0")
-    @DecimalMax(value = "10", inclusive = true, message = "Điểm phải nhỏ hơn hoặc bằng 10")
+    @DecimalMin(value = "0", inclusive = true, message = "{score.minScore}")
+    @DecimalMax(value = "10", inclusive = true, message = "{score.maxScore}")
     private Float test_score;
 
     private Float medium_score;

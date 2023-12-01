@@ -59,6 +59,9 @@ public class ClassroomServiceImp implements ClassroomService{
         }
         if(classroom != null){
             classroom.setStatus(true);
+            classroom.setName(classroom.getName().trim());
+            classroom.setAcademic_year(classroom.getAcademic_year().trim());
+            classroom.setNote(classroom.getNote().trim());
             classroomRepository.save(classroom);
             return true;
         }

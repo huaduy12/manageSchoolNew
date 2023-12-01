@@ -12,6 +12,6 @@ public class School_yearDto {
 
     private int id;
 
-    @Pattern(regexp = "20\\d{2}-20\\d{2}", message = "Tên năm học không hợp lệ")
+    @Pattern(regexp = "20\\d{2}-20\\d{2}", message = "{schoolYear.name}")
     private String name;
 }

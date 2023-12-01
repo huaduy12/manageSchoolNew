@@ -8,6 +8,7 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.modelmapper.internal.bytebuddy.description.method.MethodDescription;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Type;
@@ -81,15 +82,17 @@ public class TeacherClassServiceImp implements TeacherClassService{
     }
 
     @Override
-    public List<Teacher_classDto> getByTeacher_idAndSubjectNotNull(int teacher_id) {
-
-        List<Teacher_class> teacher_classes = teacherClassRepository.findByTeacher_IdAndSubjectNotNull(teacher_id);
+    public Page<Teacher_classDto> getByTeacher_idAndSubjectNotNull(int teacher_id,int pageNo,int pageSize,String keyword) {
+        Sort sort = Sort.by(Sort.Order.desc("id"));
+        Pageable pageable = PageRequest.of(pageNo,pageSize,sort);
+        if(keyword == null) keyword = " ";
+        Page<Teacher_class> teacher_classes = teacherClassRepository.findByTeacher_IdAndSubjectNotNull(teacher_id,keyword,pageable);
         List<Teacher_classDto> teacher_classDtos = null;
         if(teacher_classes != null){
             Type type = new TypeToken<List<Teacher_classDto>>() {}.getType();
-            teacher_classDtos = modelMapper.map(teacher_classes,type);
+            teacher_classDtos = modelMapper.map(teacher_classes.getContent(),type);
         }
-        return teacher_classDtos;
+        return new PageImpl<>(teacher_classDtos,pageable,teacher_classes.getTotalElements());
     }
 
     @Override
@@ -99,8 +102,27 @@ public class TeacherClassServiceImp implements TeacherClassService{
     }
 
     @Override
-    public List<Teacher_class> getByIdRoleAndTeacher_id(int role, int teacher_id) {
+    public Page<ClassroomDto> getByIdRoleAndTeacher_id(int role, int teacher_id,int pageNo,int pageSize,String keyword) {
+
+        //List<Teacher_class> teacher_classes = teacherClassRepository.findByRoleEqualsAndTeacher_Id(role,teacher_id);
+        Sort sort = Sort.by(Sort.Order.desc("id"));
+        Pageable pageable = PageRequest.of(pageNo,pageSize,sort);
+        if(keyword == null) keyword = " ";
+        Page<Teacher_class> teacher_classes = teacherClassRepository.findTeacherHomeroom
+                (role,teacher_id,keyword,pageable);
+
+        List<ClassroomDto> classroomDtos = new ArrayList<>();
+        for (Teacher_class t:teacher_classes.getContent()) {
+            ClassroomDto classroomDto = modelMapper.map(t.getClassroom(),ClassroomDto.class);
+            classroomDtos.add(classroomDto);
+        }
+        return new PageImpl<>(classroomDtos,pageable,teacher_classes.getTotalElements());
+    }
+
+    @Override
+    public List<Teacher_class> getClassroomByTeacher(int role,int teacher_id){
         List<Teacher_class> teacher_classes = teacherClassRepository.findByRoleEqualsAndTeacher_Id(role,teacher_id);
+
         return teacher_classes;
     }
 

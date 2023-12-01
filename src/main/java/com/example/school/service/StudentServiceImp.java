@@ -73,6 +73,9 @@ public class StudentServiceImp implements StudentService{
         }
         if(student != null){
             student.setStatus(true);
+            student.setFullName(student.getFullName().trim());
+            student.setAddress(student.getFullName().trim());
+            student.setAcademy_year(student.getAcademy_year().trim());
             return studentRepository.save(student);
         }
         return null;

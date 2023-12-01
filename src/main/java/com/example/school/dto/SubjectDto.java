@@ -14,10 +14,9 @@ import java.util.List;
 public class SubjectDto {
     private int id;
 
-    @NotBlank(message = "Vui lòng nhập  tên môn học")
+    @NotBlank(message = "{subject.name}")
     private String name;
     private Boolean status;
 
-//    private List<Teacher_subject> teacher_subjects;
-        private List<Teacher_class> teacher_classes ;
+     private List<Teacher_class> teacher_classes ;
 }

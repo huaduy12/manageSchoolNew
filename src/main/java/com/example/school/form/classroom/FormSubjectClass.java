@@ -13,24 +13,24 @@ import lombok.NoArgsConstructor;
 public class FormSubjectClass {
     private int id;
 
-    @NotNull(message = "Vui lòng chọn năm học")
-    @Min(value = 1, message = "Vui lòng chọn năm học")
+    @NotNull(message = "{subjectClassYear}")
+    @Min(value = 1, message = "{subjectClassYear}")
     private Integer school_yearId;
 
-    @NotNull(message = "Vui lòng chọn kỳ học")
-    @Min(value = 1, message = "Vui lòng chọn kỳ học")
+    @NotNull(message = "{subjectClassSemester}")
+    @Min(value = 1, message = "{subjectClassSemester}")
     private Integer semesterId;
 
     // 0: giáo viên chủ nhiệm,  1: giáo viên bộ môn
 
     private int role;
 
-    @NotNull(message = "Vui lòng chọn giáo viên")
+    @NotNull(message = "{subjectClassTeacher}")
     private Integer teacherId;
 
     private int classroomId;
 
-    @NotNull(message = "Vui lòng chọn môn học")
+    @NotNull(message = "{subjectClassSubject}")
     private Integer subjectId;
 
     private boolean status;

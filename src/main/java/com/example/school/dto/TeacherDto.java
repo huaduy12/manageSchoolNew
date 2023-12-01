@@ -20,7 +20,6 @@ public class TeacherDto {
     private String email;
     private boolean status;
 
-    // xem xét lại user ỏ đây, vì có thể lấy cả password, nên đổi thành UserDto
     private UserDto user;
 
 }

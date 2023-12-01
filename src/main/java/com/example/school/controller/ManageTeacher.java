@@ -87,8 +87,9 @@ public class ManageTeacher {
         }
         if(role ==0){
             // giáo viên CNhiem
-            List<Teacher_class> teacher_classes = teacherClassService.getByIdRoleAndTeacher_id(0,idTeacher);
+           List<Teacher_class> teacher_classes = teacherClassService.getClassroomByTeacher(0,idTeacher);
             model.addAttribute("teacher_classes",teacher_classes);
+        } else if(role ==1){
         } else if(role ==1){
             // giáo viên bo môn có thể bao gồm cả giáo viên chủ nhiệm
             List<Teacher_class> teacher_classes = teacherClassService.getByTeacher_id(idTeacher);

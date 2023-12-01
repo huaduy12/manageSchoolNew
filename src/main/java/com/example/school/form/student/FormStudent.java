@@ -22,25 +22,25 @@ public class FormStudent {
 
     private int id;
 
-    @Length(min = 6, max = 100,message = "Vui lòng nhập tên hợp lệ")
+    @Length(min = 6, max = 100,message = "{student.fullName}")
     private String fullName;
 
-    @Pattern(regexp = "^[0-9]{10}$", message = "Vui lòng nhập số điện thoại hợp lệ")
+    @Pattern(regexp = "^[0-9]{10}$", message = "{student.phoneNumber}")
     private String phoneNumber;
 
-    @NotNull(message = "Ngày sinh không được để trống")
-    @Past(message = "Ngày sinh phải là ngày trong quá khứ")
+    @NotNull(message = "{student.birthDay}")
+    @Past(message = "{student.birthDayPast}")
     @Temporal(TemporalType.DATE)
     @DateTimeFormat(pattern = "yyyy-MM-dd")  // lưu ý khi lưu đinh dạng nếu để dd/MM/yyyy thì sẽ b lỗi
     private Date birthday;
 
-    @NotBlank(message = "Vui lòng nhập địa chỉ")
+    @NotBlank(message = "{student.address}")
     private String address;
 
-    @NotBlank(message = "Vui lòng nhập niên khóa học")
+    @NotBlank(message = "{student.academyYear}")
     private String academy_year;
 
-    @NotNull(message = "Vui lòng chọn lớp học")
+    @NotNull(message = "{student.classroom}")
     private Integer classRoomId;
 
     private Classroom classroom;
