@@ -25,11 +25,9 @@ public class StudentCard implements Serializable {
     @Column(name = "photo")
     private String photo;
 
-
     @OneToOne(fetch = FetchType.LAZY,cascade = {CascadeType.DETACH,CascadeType.MERGE,CascadeType.REFRESH,CascadeType.PERSIST})
     @JoinColumn(name = "student_id")
     private Student student;
-
 
     @Override
     public String toString() {

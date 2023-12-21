@@ -30,6 +30,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.Objects;
 
 @Controller
 @RequestMapping("/manage/student")
@@ -184,6 +185,7 @@ public class ManageStudent {
             }else {
                 model.addAttribute("studentCard",studentCard);
             }
+            System.out.println(studentCard);
 
         }
         return "/student_card";
@@ -193,29 +195,29 @@ public class ManageStudent {
     @PostMapping("/imageUpload")
     public String imageUpload(@ModelAttribute("studentCard") StudentCard studentCard,@RequestParam MultipartFile img) {
 
-        StudentCard studentSave =  studentService.saveStudentCard(studentCard,img.getOriginalFilename() );
+        StudentCard studentSave =  studentService.saveStudentCard(studentCard,img);
 
         // ảnh sau khi tải lên sẽ được lưu vào ổ D: nơi lưu project template/stactic/images
         if (studentSave != null) {
-            try {
-                // noi lưu file ảnh sau  khi tạo, update
-                // E:\Spring\Project_manage_school\manage_school\target\classes\static\images
-                File saveFile = new ClassPathResource("static/images").getFile();
-//                System.out.println(saveFile);
-
-                // nơi lưu ảnh goc
-                //E:\Spring\Project_manage_school\manage_school\target\classes\static\images\Screenshot_6.png
-                Path path = Paths.get(saveFile.getAbsolutePath() + File.separator + img.getOriginalFilename());
-//                System.out.println(path);
-
-                // copy ảnh, tạo ảnh được copy được thêm mới vào thư mục trên
-                Files.copy(img.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            // lưu  ở local
+//            try {
+//                // noi lưu file ảnh sau  khi tạo, update
+//                // E:\Spring\Project_manage_school\manage_school\target\classes\static\images
+//                File saveFile = new ClassPathResource("/static/images").getFile();
+////                System.out.println(saveFile);
+//
+//                // nơi lưu ảnh goc
+//                //E:\Spring\Project_manage_school\manage_school\target\classes\static\images\Screenshot_6.png
+//                Path path = Paths.get(saveFile.getAbsolutePath() + File.separator + img.getOriginalFilename());
+////                System.out.println(path);
+//
+//                // copy ảnh, tạo ảnh được copy được thêm mới vào thư mục trên
+//                Files.copy(img.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+//
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
         }
-
         return "redirect:/manage/student/card?idStudent=" + studentCard.getStudent().getId();
     }
 

@@ -9,6 +9,7 @@ import com.example.school.form.student.FormProfileStudent;
 import com.example.school.form.student.FormStudent;
 import com.example.school.repository.StudentRepository;
 import org.springframework.data.domain.Page;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -41,7 +42,7 @@ public interface StudentService {
     // student card
 
     public StudentCard getStudentCardByStudentId(int idStudent);
-    public StudentCard saveStudentCard(StudentCard studentCard, String linkImage);
+    public StudentCard saveStudentCard(StudentCard studentCard, MultipartFile multipartFile);
 
     // lấy students từ classroom
     public List<StudentDto> getStudentByClassIdDto(int classId);

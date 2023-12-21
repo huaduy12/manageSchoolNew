@@ -166,7 +166,7 @@
                                     <div class="col-lg-6">
                                         <div id="div1">
                                             <p id="p1">Trường Trung học phổ thông Triệu Sơn 5</p>
-                                            <img th:if="${studentCard}" th:src="@{'/images/'+${studentCard.getPhoto()} }" alt="" class="image_avatar">
+                                            <img th:if="${studentCard}" th:src="@{${studentCard.getPhoto()}}" alt="" class="image_avatar">
                                             <div id="div2">
                                                 <p class="p2" ><label class="label1">Họ và tên: </label> <label class="label2" th:text="${studentDto} ? ${studentDto.fullName} : '' "></label></p>
                                                 <p class="p2" ><label class="label1">Niên khóa: </label> <label class="label2" th:text="${studentDto} ? ${studentDto.academy_year} : '' "></label></p>

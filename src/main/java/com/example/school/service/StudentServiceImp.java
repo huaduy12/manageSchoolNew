@@ -15,6 +15,7 @@ import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.lang.reflect.Type;
 import java.util.List;
@@ -37,6 +38,9 @@ public class StudentServiceImp implements StudentService{
 
     @Autowired
     private ClassroomService classroomService;
+
+    @Autowired
+    private ImageUploadService imageUploadService;
     @Override
     public List<StudentDto> getAllStudent() {
         List<Student> students = studentRepository.findAll();
@@ -207,8 +211,9 @@ public class StudentServiceImp implements StudentService{
     }
 
     @Override
-    @Transactional
-    public StudentCard saveStudentCard(StudentCard studentCard, String linkImage) {
+    public StudentCard saveStudentCard(StudentCard studentCard, MultipartFile image) {
+        // uplload image on firebase
+        String linkFirebase = imageUploadService.upload(image);
         Optional<StudentCard> result = studentCardRepository.findById(studentCard.getId());
            StudentCard stUpdate = null;
            StudentCard stCreateNew = new StudentCard();
@@ -219,13 +224,13 @@ public class StudentServiceImp implements StudentService{
            }
            // nếu ảnh được update
            if(stUpdate != null){
-               stUpdate.setPhoto(linkImage);
+               stUpdate.setPhoto(linkFirebase);
                studentSave =  studentCardRepository.save(stUpdate);
            }
 
            // nếu ảnh chưa được tạo, thì tạo mới
            if(stUpdate == null){
-               stCreateNew.setPhoto(linkImage);
+               stCreateNew.setPhoto(linkFirebase);
                stCreateNew.setStudent(studentCard.getStudent());
                studentSave =  studentCardRepository.save(stCreateNew);
            }
