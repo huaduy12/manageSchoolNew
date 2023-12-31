@@ -5,6 +5,7 @@
     - Front-end: Html/Css, Bootstrap 4, Thymeleaf, Javascript, Jquery
     - Database: MySql
     - Security: Spring Security
+    - Cloud Services: Firebase
 - Giao diện login khi mới vào web thì sẽ được security đẩy ra
 <img src="./images-git/login.png">
 - Giao diện và chức năng với admin
