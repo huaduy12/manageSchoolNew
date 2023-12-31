@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <title>Thanh toán thành công</title>
+</head>
+
+<body>
+<!-- back to top -->
+
+<!-- start body -->
+<div class="body py-5">
+    <div class="container">
+        <div class="w-50 m-auto">
+
+            <h1 class="my-3 text-success text-center">Thanh toán thành công</h1>
+
+            <h2 class="my-2">Chi tiết đơn hàng</h2>
+
+            <table class="table table-bordered">
+                <tbody>
+                <tr>
+                    <td>Thông tin đơn hàng:</td>
+                    <td><span th:text="${orderId}">[order ID]</span></td>
+                </tr>
+                <tr>
+                    <td>Tổng tiền:</td>
+                    <td><span th:text="${#numbers.formatDecimal(totalPrice, 0, 'DEFAULT',0, 'POINT')}">[total price]</span></td>
+                </tr>
+                <tr>
+                    <td>Thời gian thanh toán:</td>
+                    <td><span th:text="${paymentTime}">[payment time]</span></td>
+                </tr>
+                <tr>
+                    <td>Mã giao dịch:</td>
+                    <td><span th:text="${transactionId}">[transaction ID]</span></td>
+                </tr>
+                </tbody>
+            </table>
+            <a id="redirectLink" th:href="@{/student/tuition/not-paid}" class="btn btn-primary">Quay lại</a>
+            <p>Tự động chuyển hướng sau <span id="countdown">5</span></p>
+        </div>
+    </div>
+</div>
+<!-- end body -->
+
+
+<!-- start footer -->
+<script>
+    // Lấy thẻ p và a bằng JavaScript
+    var countdownElement = document.getElementById('countdown');
+    var redirectLink = document.getElementById('redirectLink');
+
+    // Đặt thời gian đếm ngược (5 giây)
+    var countdown = 5;
+
+    // Hàm đếm ngược và chuyển hướng
+    function startCountdown() {
+        countdownElement.textContent = countdown; // Cập nhật giá trị đếm ngược
+
+        if (countdown <= 0) {
+            // Khi đếm ngược kết thúc, chuyển hướng
+            window.location.href = redirectLink.href;
+        } else {
+            // Nếu chưa kết thúc, giảm giá trị đếm ngược và gọi lại hàm sau 1 giây
+            countdown--;
+            setTimeout(startCountdown, 1000);
+        }
+    }
+
+    // Bắt đầu đếm ngược khi trang được tải
+    window.onload = startCountdown;
+</script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+
+</body>
+
+
+</html>

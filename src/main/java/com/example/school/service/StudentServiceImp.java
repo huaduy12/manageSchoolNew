@@ -9,11 +9,14 @@ import com.example.school.form.student.FormStudent;
 import com.example.school.repository.ParentRepository;
 import com.example.school.repository.StudentCardRepository;
 import com.example.school.repository.StudentRepository;
+import com.example.school.security.EntityUserDetail;
+import com.example.school.service.account.UserService;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -41,6 +44,9 @@ public class StudentServiceImp implements StudentService{
 
     @Autowired
     private ImageUploadService imageUploadService;
+
+    @Autowired
+    private UserService userService;
     @Override
     public List<StudentDto> getAllStudent() {
         List<Student> students = studentRepository.findAll();
@@ -56,6 +62,14 @@ public class StudentServiceImp implements StudentService{
     @Override
     public List<StudentDto> getStudentsStudying() {
         return null;
+    }
+
+    @Override
+    public StudentDto getStudentLogin(@AuthenticationPrincipal EntityUserDetail userDetail) {
+        String username = userDetail.getUsername();
+        User user = userService.getUserByUsername(username);
+        StudentDto studentDto = findByUser_id(user.getId());
+        return studentDto;
     }
 
     @Override
@@ -188,7 +202,6 @@ public class StudentServiceImp implements StudentService{
     public Boolean saveParent(int idStudent,Parent parent) {
 
         Student student = findById(idStudent);
-        System.out.println(student);
         if(student != null){
             parentRepository.save(parent);
             if(student.getParent() == null){

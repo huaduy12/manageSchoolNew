@@ -22,4 +22,6 @@ public interface ClassroomService {
 
     public Page<ClassroomDto> findPaginated(int pageNo, int pageSize,String keyword);
 
+    public List<ClassroomDto> getClassIdNotIn(List<Integer> id,boolean status);
+
 }

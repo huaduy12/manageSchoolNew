@@ -15,6 +15,10 @@ public interface ClassroomRepository  extends JpaRepository<Classroom,Integer> {
 
     public List<Classroom> findByStatusEquals(boolean status);
 
+    List<Classroom> findByIdNotInAndStatus(List<Integer> id,boolean status);
+
     @Query("select t from Classroom t where (concat(t.name,' ',t.academic_year) like %?1%)")
     Page<Classroom> findAll(String keyword, Pageable pageable);
+
+
 }

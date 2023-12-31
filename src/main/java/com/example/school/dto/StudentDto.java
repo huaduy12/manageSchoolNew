@@ -27,6 +27,8 @@ public class StudentDto {
 
     private String academy_year;
 
+    private Long account_balance;
+
     private ClassroomDto classroom;
 
     private UserDto user;

@@ -29,4 +29,15 @@ public class School_year implements Serializable {
 
     @OneToMany(mappedBy = "school_year",fetch = FetchType.LAZY,cascade = {CascadeType.DETACH,CascadeType.REFRESH,CascadeType.PERSIST,CascadeType.MERGE})
     private List<Score> results ;
+
+    @OneToMany(mappedBy = "school_year",fetch = FetchType.LAZY,cascade = {CascadeType.DETACH,CascadeType.REFRESH,CascadeType.PERSIST,CascadeType.MERGE})
+    private List<Revenue> revenue ;
+
+    @Override
+    public String toString() {
+        return "School_year{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }

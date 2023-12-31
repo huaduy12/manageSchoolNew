@@ -42,6 +42,9 @@ public class Student implements Serializable {
     @Column(name = "academy_year")
     private String academy_year;
 
+    @Column(name = "account_balance")
+    private Long account_balance;
+
     @CreationTimestamp
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
@@ -64,10 +67,13 @@ public class Student implements Serializable {
     @JoinColumn(name = "parent_id")
     private Parent parent;
 
-    @OneToOne(fetch = FetchType.LAZY,cascade = {CascadeType.DETACH,CascadeType.MERGE,CascadeType.REFRESH,CascadeType.PERSIST},mappedBy = "student")
+    @OneToOne(mappedBy = "student",fetch = FetchType.LAZY,cascade = {CascadeType.DETACH,CascadeType.MERGE,CascadeType.REFRESH,CascadeType.PERSIST})
     private StudentCard studentCard;
 
     @OneToMany(mappedBy = "student",fetch = FetchType.LAZY,cascade = {CascadeType.DETACH,CascadeType.MERGE,CascadeType.REFRESH,CascadeType.REMOVE})
     private List<Score> results;
+
+    @OneToMany(mappedBy = "student",fetch = FetchType.LAZY,cascade = {CascadeType.DETACH,CascadeType.MERGE,CascadeType.REFRESH})
+    private List<Revenue_Detail> revenue_details;
 
 }

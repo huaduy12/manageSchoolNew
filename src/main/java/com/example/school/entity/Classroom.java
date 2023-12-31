@@ -37,6 +37,9 @@ public class Classroom implements Serializable {
     @OneToMany(fetch = FetchType.LAZY,cascade = {CascadeType.DETACH,CascadeType.MERGE,CascadeType.REFRESH,CascadeType.PERSIST},mappedBy = "classroom")
     private List<Teacher_class> teacher_classes;
 
+    @OneToMany(mappedBy = "classroom",fetch = FetchType.LAZY,cascade = {CascadeType.DETACH,CascadeType.MERGE,CascadeType.REFRESH})
+    private List<RevenueClass> revenueClasses;
+
     @Override
     public String toString() {
         return "Classroom{" +

@@ -4,6 +4,7 @@ import com.example.school.dto.StudentDto;
 import com.example.school.dto.TeacherDto;
 import com.example.school.dto.UserDto;
 import com.example.school.entity.RoleTeacher;
+import com.example.school.entity.StudentCard;
 import com.example.school.entity.Teacher;
 import com.example.school.entity.User;
 import com.example.school.form.student.FormProfileStudent;
@@ -103,12 +104,12 @@ public class PersonalController {
 
     @GetMapping("/profileStudent")
     public String profileStudent(@AuthenticationPrincipal EntityUserDetail userDetail, Model model){
-        String username = userDetail.getUsername();
-        User user = userService.getUserByUsername(username);
-        StudentDto studentDto = studentService.findByUser_id(user.getId());
 
+        StudentDto studentDto = studentService.getStudentLogin(userDetail);
+        StudentCard studentCard = studentService.getStudentCardByStudentId(studentDto.getId());
         if(studentDto != null){
             model.addAttribute("studentDto",studentDto);
+            model.addAttribute("studentCard",studentCard);
             model.addAttribute("formProfileStudent",studentDto);
         }
         //tránh trường hợp người đó tạo tài khoản nhưng chưa co thong tin cá nhân

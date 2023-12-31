@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Thanh toán học phí</title>
+    <th:block th:replace="fragment/header :: html_head"></th:block>
+
+    <style>
+        .dropdown-item{
+            width: -webkit-fill-available;
+        }
+        .error {
+            border-color: #ff0000 !important; /* Màu đỏ */
+        }
+    </style>
+
+</head>
+
+<body>
+
+<!--*******************
+    Preloader start
+********************-->
+<div id="preloader">
+    <div class="loader">
+        <svg class="circular" viewBox="25 25 50 50">
+            <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="3" stroke-miterlimit="10" />
+        </svg>
+    </div>
+</div>
+<!--*******************
+    Preloader end
+********************-->
+
+
+<!--**********************************
+    Main wrapper start
+***********************************-->
+<div id="main-wrapper">
+
+    <!--**********************************
+        Nav header start
+    ***********************************-->
+    <div th:replace="fragment/header :: nav_header">
+    </div>
+    <!--**********************************
+        Nav header end
+    ***********************************-->
+
+    <!--**********************************
+        Header start
+    ***********************************-->
+    <div th:replace="fragment/header :: header">
+    </div>
+    <!--**********************************
+        Header end ti-comment-alt
+    ***********************************-->
+
+    <!--**********************************
+        Sidebar start
+    ***********************************-->
+    <div th:replace="fragment/header :: nk_sidebar"></div>
+    <!--**********************************
+        Sidebar end
+    ***********************************-->
+
+    <!--**********************************
+        Content body start
+    ***********************************-->
+    <div class="content-body">
+
+        <div class="row page-titles mx-0">
+            <div class="col p-md-0">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="javascript:void(0)">Dashboard</a></li>
+                    <li class="breadcrumb-item active"><a href="javascript:void(0)">Các khoản học phí</a></li>
+                </ol>
+            </div>
+        </div>
+        <!-- row -->
+
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4  class="card-title">Danh sách các khoản cần đóng</h4>
+
+
+                            <div class="row">
+                                <div class="col-8">
+                                    <h4 class="btn btn-info" style="margin: initial">
+                                        <i class="fa fa-money" aria-hidden="true"></i> Số dư cá nhân: <span th:text="${#numbers.formatDecimal(totalMoney, 0, 'DEFAULT',0, 'POINT')}"></span> đ</h4>
+                                    <button class="btn btn-facebook ml-4" data-toggle="modal" data-target="#modalAddTuition">
+                                        <i class="fa fa-university" aria-hidden="true"></i> Nạp tiền tài khoản</button>
+                                </div>
+
+                                <div class="col-4">
+                                    <div class="input-group icons">
+                                        <form method="get" style="display: flex;width: 100%">
+                                            <input type="search" name="keyword" th:value="${keyword}" class="form-control" style="border: 2px solid #ced4da;" placeholder="Tìm kiếm" aria-label="Tìm kiếm">
+                                            <button type="submit" id="buttonSearch" class="btn btn-danger" style="border-radius: 0px">
+                                                <i class="fa fa-search" aria-hidden="true"></i> </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--                                nên làm thành mục lớn từu năm học ,kỳ học có thêr xem dduojc lơp học, thầy cô, học sinh-->
+                            <div class="table-responsive">
+                                <table class="table table-bordered verticle-middle header-border table-hover">
+                                    <thead>
+                                    <tr>
+                                        <th>Tên khoản thu</th>
+                                        <th>Năm học</th>
+                                        <th>Kỳ học</th>
+                                        <th>Giá tiền</th>
+                                        <th>Thời hạn nộp</th>
+                                        <th>Chức năng</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="revenueClass : ${revenueClasses}">
+                                        <td th:text="${revenueClass.revenue.name}"></td>
+                                        <td th:text="${revenueClass.revenue.school_year.name}"></td>
+                                        <td th:text="${revenueClass.revenue.semester.name}"></td>
+                                        <td th:text="${#numbers.formatDecimal(revenueClass.revenue.price, 0, 'DEFAULT',0, 'POINT')} + ' đ'"></td>
+                                        <td th:text="${#dates.format(revenueClass.revenue.createdAt,'dd/MM/yyyy')}"></td>
+
+                                        <td>
+                                            <div class="btn-group" role="group"  >
+                                                <button type="button" class="btn mb-1 btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Thanh toán</button>
+                                                <div class="dropdown-menu"  th:data-id-revenue="${revenueClass.revenue.id}">
+
+                                                    <button type="button" class="dropdown-item btn btn-primary personal-balance" data-toggle="modal" data-target="#modalPersonal">Số dư cá nhân</button>
+                                                    <button type="button" class="dropdown-item btn btn-warning online-balance" data-toggle="modal" data-target="#modalOnline">Thanh toán trực tuyến</button>
+
+                                                </div>
+                                            </div>
+                                        </td>
+
+                                    </tr>
+
+                                </table>
+                            </div>
+
+                            <!-- start pagination   -->
+<!--                            <div th:if="${classroomDtos.getTotalPages() >0}">-->
+<!--                                &lt;!&ndash; start total element  &ndash;&gt;-->
+<!--                                <div th:if="${(pageNo -1) * pageSize +1} < ${classroomDtos.getTotalElements()}" class="text-left" th:text="${(pageNo -1) * pageSize +1} + ' - ' + (${pageNo*pageSize} > ${classroomDtos.getTotalElements()} ? ${classroomDtos.getTotalElements()} : ${pageNo*pageSize} ) + ' of ' + ${classroomDtos.getTotalElements()}"></div>-->
+<!--                                <div th:if="${(pageNo -1) * pageSize +1} == ${classroomDtos.getTotalElements()}" class="text-left" th:text="(${pageNo*pageSize} > ${classroomDtos.getTotalElements()} ? ${classroomDtos.getTotalElements()} : ${pageNo*pageSize} ) + ' of ' + ${classroomDtos.getTotalElements()}"></div>-->
+<!--                                &lt;!&ndash; end total element  &ndash;&gt;-->
+
+<!--                                <div class="bootstrap-pagination">-->
+<!--                                    <nav  th:if="${classroomDtos.getTotalPages() >1}">-->
+<!--                                        <ul class="pagination justify-content-end">-->
+
+<!--                                            <li class="page-item " th:if="${pageNo > 1}">-->
+<!--                                                <a th:if="${showClass}" class="page-link" th:href="'/manage/class/page/' + (${pageNo}-1) + ${keyword != null ? '?keyword=' + keyword : ''}" tabindex="-1">Previous</a>-->
+<!--                                                <a th:if="${showScore}" class="page-link" th:href="'/manage/score/page/' + (${pageNo}-1)+ ${keyword != null ? '?keyword=' + keyword : ''}" tabindex="-1">Previous</a>-->
+<!--                                                <a th:if="${showAssign}" class="page-link" th:href="'/manage/assign/page/' + (${pageNo}-1)+ ${keyword != null ? '?keyword=' + keyword : ''}" tabindex="-1">Previous</a>-->
+<!--                                            </li>-->
+<!--                                            &lt;!&ndash; print pages smaller than 6  &ndash;&gt;-->
+<!--                                            <li th:if="${pageNo < 6}" class="page-item" th:each="i : ${#numbers.sequence(1,classroomDtos.getTotalPages())}">-->
+<!--                                                <a class="page-link" th:if="${pageNo != i and showClass == true }" th:href="@{'/manage/class/page/' + ${i} + ${keyword != null ? '?keyword=' + keyword : ''}}  " th:text="${i}"></a>-->
+<!--                                                <a class="page-link" th:if="${pageNo != i and showScore == true}" th:href="@{'/manage/score/page/' + ${i}+ ${keyword != null ? '?keyword=' + keyword : ''}}" th:text="${i}"></a>-->
+<!--                                                <a class="page-link" th:if="${pageNo != i and showAssign == true}" th:href="@{'/manage/assign/page/' + ${i}+ ${keyword != null ? '?keyword=' + keyword : ''}}" th:text="${i}"></a>-->
+
+<!--                                                <a class="page-link" style="color: #000" th:unless="${pageNo != i}" th:text="${i}"></a>-->
+<!--                                            </li>-->
+
+
+<!--                                            &lt;!&ndash; print pages larger than or equal to 6  &ndash;&gt;-->
+<!--                                            <li th:if="${pageNo >= 6 }" class="page-item">-->
+<!--                                                <a th:if="${showClass}" class="page-link"  th:href="@{'/manage/class/page/1'+ ${keyword != null ? '?keyword=' + keyword : ''}}" th:text="'1'"></a>-->
+<!--                                                <a th:if="${showScore}" class="page-link"  th:href="@{'/manage/score/page/1'+ ${keyword != null ? '?keyword=' + keyword : ''}}" th:text="'1'"></a>-->
+<!--                                                <a th:if="${showAssign}" class="page-link"  th:href="@{'/manage/assign/page/1'+ ${keyword != null ? '?keyword=' + keyword : ''}}" th:text="'1'"></a>-->
+<!--                                            </li>-->
+<!--                                            <li th:if="${pageNo >= 6 }" class="page-item">-->
+<!--                                                <a class="page-link" style="color: #000" th:text="'...'"></a>-->
+<!--                                            </li>-->
+
+<!--                                            <li th:if="${pageNo >= 6 and pageNo < classroomDtos.getTotalPages()  }" class="page-item" th:each="i : ${#numbers.sequence((pageNo)-1,(pageNo)+1)}">-->
+<!--                                                <a class="page-link" th:if="${pageNo != i and showClass == true }" th:href="@{'/manage/class/page/' + ${i}+ ${keyword != null ? '?keyword=' + keyword : ''}}" th:text="${i}"></a>-->
+<!--                                                <a class="page-link" th:if="${pageNo != i and showScore == true}" th:href="@{'/manage/score/page/' + ${i}+ ${keyword != null ? '?keyword=' + keyword : ''}}" th:text="${i}"></a>-->
+<!--                                                <a class="page-link" th:if="${pageNo != i and showAssign ==true}" th:href="@{'/manage/assign/page/' + ${i}+ ${keyword != null ? '?keyword=' + keyword : ''}}" th:text="${i}"></a>-->
+
+<!--                                                <a class="page-link" style="color: #000" th:unless="${pageNo != i}" th:text="${i}"></a>-->
+<!--                                            </li>-->
+<!--                                            &lt;!&ndash; conditions print last page  &ndash;&gt;-->
+<!--                                            <li th:if="${pageNo >= 6 and pageNo == classroomDtos.getTotalPages()}" class="page-item" th:each="i : ${#numbers.sequence((pageNo)-2,(pageNo))}">-->
+<!--                                                <a class="page-link" th:if="${pageNo != i and showClass == true}" th:href="@{'/manage/class/page/' + ${i}+ ${keyword != null ? '?keyword=' + keyword : ''}}" th:text="${i}"></a>-->
+<!--                                                <a class="page-link" th:if="${pageNo != i  and showScore == true}" th:href="@{'/manage/score/page/' + ${i}+ ${keyword != null ? '?keyword=' + keyword : ''}}" th:text="${i}"></a>-->
+<!--                                                <a class="page-link" th:if="${pageNo != i  and showAssign == true}" th:href="@{'/manage/assign/page/' + ${i}+ ${keyword != null ? '?keyword=' + keyword : ''}}" th:text="${i}"></a>-->
+
+<!--                                                <a class="page-link" style="color: #000" th:unless="${pageNo != i}" th:text="${i}"></a>-->
+<!--                                            </li>-->
+
+
+<!--                                            <li class="page-item " th:if="${pageNo < classroomDtos.getTotalPages()}">-->
+<!--                                                <a th:if="${showClass}" class="page-link" th:href="'/manage/class/page/' + (${pageNo}+1)+ ${keyword != null ? '?keyword=' + keyword : ''}" tabindex="-1">Next</a>-->
+<!--                                                <a th:if="${showScore}" class="page-link" th:href="'/manage/score/page/' + (${pageNo}+1)+ ${keyword != null ? '?keyword=' + keyword : ''}" tabindex="-1">Next</a>-->
+<!--                                                <a th:if="${showAssign}" class="page-link" th:href="'/manage/assign/page/' + (${pageNo}+1)+ ${keyword != null ? '?keyword=' + keyword : ''}" tabindex="-1">Next</a>-->
+<!--                                            </li>-->
+<!--                                        </ul>-->
+<!--                                    </nav>-->
+<!--                                </div>-->
+<!--                            </div>-->
+                            <!-- end pagination   -->
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- #/ container -->
+    </div>
+    <!--**********************************
+        Content body end
+    ***********************************-->
+
+
+    <!--**********************************
+        Footer start
+    ***********************************-->
+    <div th:replace="fragment/footer :: footer">
+    </div>
+    <!--**********************************
+        Footer end
+    ***********************************-->
+</div>
+<!--**********************************
+    Main wrapper end
+***********************************-->
+
+<!-- Modal -->
+<div class="modal fade" id="modalAddTuition" tabindex="-1" role="dialog" aria-labelledby="modalAddTuition" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modelAddEdit">Nộp tiền học</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post" th:action="@{/student/tuition/addTuition}" onsubmit="return validateForm()" >
+                <div class="modal-body" id ="modalError">
+                    <div class="form-group">
+                        <label for="money">Vui lòng nhập số tiền cần nộp học: </label>
+                        <input type="text" class="form-control" style="font-size: 18px" id="money" name="moneyTuition"  >
+                        <p class="text-danger">Lưu ý nhập số tiền là số</p>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                    <button type="submit" class="btn btn-primary">Nạp tiền</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalOnline">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Xác nhận</h5>
+                <button type="button" class="close" data-dismiss="modal"><span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">Bạn có chắc chắn muốn thanh toán trực tuyến không ?</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Không</button>
+                <form method="post" th:action="@{/student/tuition/payment-tuition-online}">
+                    <input type="hidden" id="idRevenueOnline" name="idRevenue"/>
+                    <button type="submit" class="btn btn-primary">Đồng ý</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalPersonal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Xác nhận</h5>
+                <button type="button" class="close" data-dismiss="modal"><span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">Bạn có chắc chắn muốn thanh toán qua số dư của tài khoản không ?</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Không</button>
+                <form method="post" th:action="@{/student/tuition/payment-tuition}">
+                    <input type="hidden" id="idRevenue" name="idRevenue"/>
+                    <button type="submit" class="btn btn-primary">Đồng ý</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="modalBlock">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Xác nhận</h5>
+                <button type="button" class="close" data-dismiss="modal"><span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">Bạn có chắc chắn muốn cho khóa lớp học không ?</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Không</button>
+                <form method="post" th:action="@{/manage/class/block}">
+                    <input type="hidden" id="id-block" name="idBlock"/>
+                    <button type="submit" class="btn btn-primary">Đồng ý</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalOpen">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Xác nhận</h5>
+                <button type="button" class="close" data-dismiss="modal"><span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">Bạn có chắc chắn muốn mở khóa lại lớp học không ?</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Không</button>
+                <form method="post" th:action="@{/manage/class/open}">
+                    <input type="hidden" id="id-open" name="idOpen"/>
+                    <button type="submit" class="btn btn-primary">Đồng ý</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function() {
+        var moneyInput = $('#money');
+
+        moneyInput.on('input', function() {
+            var inputValue = moneyInput.val();
+
+            // Loại bỏ tất cả các dấu phẩy và dấu chấm nếu có
+            inputValue = inputValue.replace(/[,\.]/g, '');
+
+            // Kiểm tra nếu giá trị chỉ chứa số
+            if (/^\d+$/.test(inputValue)) {
+                var formattedValue = parseFloat(inputValue).toLocaleString('en-US');
+                moneyInput.val(formattedValue);
+                moneyInput.removeClass("error")
+            } else {
+                // Nếu nhập chữ cái hoặc ký tự khác, hiển thị thông báo lỗi
+                moneyInput.addClass("error")
+            }
+        });
+    });
+</script>
+
+<script>
+    function validateForm() {
+        var moneyInput = document.getElementById('money');
+
+        // Loại bỏ tất cả các dấu phẩy và dấu chấm nếu có
+        var inputValue = moneyInput.value.replace(/[,\.]/g, '');
+
+        // Kiểm tra nếu giá trị chỉ chứa số
+        if (/^\d+$/.test(inputValue)) {
+            return true; // Cho phép gửi form
+        } else {
+            // Nếu nhập chữ cái hoặc ký tự khác, hiển thị thông báo lỗi
+            alert("Vui lòng nhập số tiền là số")
+            return false; // Ngăn chặn việc gửi form
+        }
+    }
+</script>
+
+
+
+<script>
+    $(document).ready(function (){
+
+        $(".personal-balance").click(function (){
+            let id = $(this).parent().data("id-revenue")
+            $("#idRevenue").val(id)
+        })
+
+        $(".online-balance").click(function (){
+            let id = $(this).parent().data("id-revenue")
+            $("#idRevenueOnline").val(id)
+        })
+    });
+
+</script>
+
+
+<script th:src="@{/plugins/toastr/js/toastr.min.js}"></script>
+<script th:src="@{/plugins/toastr/js/toastr.init.js}"></script>
+
+
+<script th:inline="javascript" th:if="${addSuccess != null}">
+    toastr.success("Nạp tiền thành công", "Thành công", {
+        timeOut: 5e3,
+        closeButton: !0,
+        debug: !1,
+        newestOnTop: !0,
+        progressBar: !0,
+        positionClass: "toast-top-right",
+        preventDuplicates: !0,
+        onclick: null,
+        showDuration: "300",
+        hideDuration: "1000",
+        extendedTimeOut: "1000",
+        showEasing: "swing",
+        hideEasing: "linear",
+        showMethod: "fadeIn",
+        hideMethod: "fadeOut",
+        tapToDismiss: !1
+    });
+</script>
+
+<script th:inline="javascript" th:if="${addFail != null}">
+    toastr.error("Nạp tiền thất bại", "Thất bại", {
+        timeOut: 5e3,
+        closeButton: !0,
+        debug: !1,
+        newestOnTop: !0,
+        progressBar: !0,
+        positionClass: "toast-top-right",
+        preventDuplicates: !0,
+        onclick: null,
+        showDuration: "300",
+        hideDuration: "1000",
+        extendedTimeOut: "1000",
+        showEasing: "swing",
+        hideEasing: "linear",
+        showMethod: "fadeIn",
+        hideMethod: "fadeOut",
+        tapToDismiss: !1
+    });
+</script>
+
+<script th:inline="javascript" th:if="${paymentSuccess != null}">
+    toastr.success("Thanh toán học phí môn học thành công", "Thành công", {
+        timeOut: 5e3,
+        closeButton: !0,
+        debug: !1,
+        newestOnTop: !0,
+        progressBar: !0,
+        positionClass: "toast-top-right",
+        preventDuplicates: !0,
+        onclick: null,
+        showDuration: "300",
+        hideDuration: "1000",
+        extendedTimeOut: "1000",
+        showEasing: "swing",
+        hideEasing: "linear",
+        showMethod: "fadeIn",
+        hideMethod: "fadeOut",
+        tapToDismiss: !1
+    });
+</script>
+
+<script th:inline="javascript" th:if="${paymentFail != null}">
+    toastr.error("Thanh toán học phí môn học thất bại", "Thất bại", {
+        timeOut: 5e3,
+        closeButton: !0,
+        debug: !1,
+        newestOnTop: !0,
+        progressBar: !0,
+        positionClass: "toast-top-right",
+        preventDuplicates: !0,
+        onclick: null,
+        showDuration: "300",
+        hideDuration: "1000",
+        extendedTimeOut: "1000",
+        showEasing: "swing",
+        hideEasing: "linear",
+        showMethod: "fadeIn",
+        hideMethod: "fadeOut",
+        tapToDismiss: !1
+    });
+</script>
+
+<!--**********************************
+    Scripts
+***********************************-->
+<script th:src="@{/plugins/common/common.min.js}"></script>
+<script th:src="@{/js/custom.min.js}"></script>
+<script th:src="@{/js/settings.js}"></script>
+<script th:src="@{/js/gleek.js}"></script>
+<script th:src="@{/js/styleSwitcher.js}"></script>
+
+<script th:src="@{/plugins/tables/js/jquery.dataTables.min.js}"></script>
+<script th:src="@{/plugins/tables/js/datatable/dataTables.bootstrap4.min.js}"></script>
+<script th:src="@{/plugins/tables/js/datatable-init/datatable-basic.min.js}"></script>
+
+</body>
+
+</html>

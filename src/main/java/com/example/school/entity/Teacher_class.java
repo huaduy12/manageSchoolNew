@@ -62,7 +62,6 @@ public class Teacher_class implements Serializable {
                 ", role=" + role +
                 ", teacher=" + teacher.getFullName() +
                 ", classroom=" + classroom.getName() +
-                ", subject=" + subject +
                 ", status=" + status +
                 '}';
     }

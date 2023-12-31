@@ -11743,7 +11743,8 @@ table.dataTable thead .sorting::after {
       z-index: 2;
       color: #162336; }
     .tdl-holder input[type=checkbox]:checked ~ span {
-      text-decoration: line-through;
+      /*text-decoration: line-through;*/
+      color: red;
       position: relative; }
   .tdl-holder input[type=text] {
     background-color: #fff;

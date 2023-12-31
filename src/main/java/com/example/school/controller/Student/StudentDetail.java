@@ -34,10 +34,8 @@ public class StudentDetail {
     @GetMapping("/subject")
     public String showSubject(@AuthenticationPrincipal EntityUserDetail userDetail, Model model){
 
-        String username = userDetail.getUsername();
-        User user = userService.getUserByUsername(username);
-
-        StudentDto studentDto = studentService.findByUser_id(user.getId());
+        StudentDto studentDto = studentService.getStudentLogin(userDetail);
+        System.out.println("StudentDto: " + studentDto);
         List<ScoreDto> scoreDtos = scoreService.getAllStudentId(studentDto.getId());
 
         model.addAttribute("scoreDtos",scoreDtos);

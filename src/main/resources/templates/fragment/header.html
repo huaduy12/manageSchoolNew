@@ -198,6 +198,24 @@
           <i class="fa fa-book" aria-hidden="true"></i><span class="nav-text">Xem điểm môn học</span>
         </a>
       </li>
+      <li sec:authorize="!hasRole('ROLE_ADMIN') and !hasRole('ROLE_MANAGER') and hasRole('ROLE_USER')">
+        <a class="has-arrow" href="javascript:void()" aria-expanded="false">
+          <i class="fa fa-money menu-icon"></i> <span class="nav-text">Học phí</span>
+        </a>
+        <ul aria-expanded="false">
+          <li><a  th:href="@{/student/tuition/paid}">Các khoản đã đóng</a></li>
+          <li><a th:href="@{/student/tuition/not-paid}" >Các khoản chưa đóng</a></li>
+        </ul>
+      </li>
+
+      <li sec:authorize="hasRole('ROLE_ADMIN') and hasRole('ROLE_MANAGER') and hasRole('ROLE_USER')">
+        <a class="has-arrow" href="javascript:void()" aria-expanded="false">
+          <i class="fa fa-money menu-icon"></i> <span class="nav-text">Quản lý khoản thu</span>
+        </a>
+        <ul aria-expanded="false">
+          <li><a th:href="@{/manage/revenue}">Khoản thu</a></li>
+        </ul>
+      </li>
 
     </ul>
   </div>

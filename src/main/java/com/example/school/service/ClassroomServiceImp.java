@@ -114,4 +114,10 @@ public class ClassroomServiceImp implements ClassroomService{
         }
         return null;
     }
+
+    @Override
+    public List<ClassroomDto> getClassIdNotIn(List<Integer> ids, boolean status) {
+        List<Classroom> classrooms = classroomRepository.findByIdNotInAndStatus(ids,status);
+        return modelMapper.map(classrooms,new TypeToken<List<ClassroomDto>>(){}.getType());
+    }
 }

@@ -29,4 +29,6 @@ public class Semester implements Serializable {
     @OneToMany(mappedBy = "semester",fetch = FetchType.LAZY,cascade = {CascadeType.DETACH,CascadeType.REFRESH,CascadeType.PERSIST,CascadeType.MERGE})
     private List<Score> results;
 
+    @OneToMany(mappedBy = "semester",fetch = FetchType.LAZY,cascade = {CascadeType.DETACH,CascadeType.REFRESH,CascadeType.PERSIST,CascadeType.MERGE})
+    private List<Revenue> revenue;
 }

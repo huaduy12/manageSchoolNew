@@ -8,7 +8,9 @@ import com.example.school.entity.Teacher;
 import com.example.school.form.student.FormProfileStudent;
 import com.example.school.form.student.FormStudent;
 import com.example.school.repository.StudentRepository;
+import com.example.school.security.EntityUserDetail;
 import org.springframework.data.domain.Page;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -17,6 +19,8 @@ public interface StudentService {
 
     public List<StudentDto> getAllStudent();
     public List<StudentDto> getStudentsStudying();
+
+    public StudentDto getStudentLogin(@AuthenticationPrincipal EntityUserDetail entityUserDetail);
 
     public Student save(FormStudent formStudent);
     public void save(Student student);

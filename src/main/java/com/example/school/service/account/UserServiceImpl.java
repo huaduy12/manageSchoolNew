@@ -80,4 +80,6 @@ public class UserServiceImpl implements UserService {
                 roles.stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
         return mapRoles;
     }
+
+
 }
