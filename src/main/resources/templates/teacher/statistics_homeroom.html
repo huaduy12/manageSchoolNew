@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <title>Thống kê khoản thu</title>
+  <th:block th:replace="fragment/header :: html_head"></th:block>
+
+
+</head>
+
+<body>
+
+<!--*******************
+    Preloader start
+********************-->
+<div id="preloader">
+  <div class="loader">
+    <svg class="circular" viewBox="25 25 50 50">
+      <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="3" stroke-miterlimit="10" />
+    </svg>
+  </div>
+</div>
+<!--*******************
+    Preloader end
+********************-->
+
+
+<!--**********************************
+    Main wrapper start
+***********************************-->
+<div id="main-wrapper">
+
+  <!--**********************************
+      Nav header start
+  ***********************************-->
+  <div th:replace="fragment/header :: nav_header">
+  </div>
+  <!--**********************************
+      Nav header end
+  ***********************************-->
+
+  <!--**********************************
+      Header start
+  ***********************************-->
+  <div th:replace="fragment/header :: header">
+  </div>
+  <!--**********************************
+      Header end ti-comment-alt
+  ***********************************-->
+
+  <!--**********************************
+      Sidebar start
+  ***********************************-->
+  <div th:replace="fragment/header :: nk_sidebar"></div>
+  <!--**********************************
+      Sidebar end
+  ***********************************-->
+
+  <!--**********************************
+      Content body start
+  ***********************************-->
+  <div class="content-body">
+
+    <div class="row page-titles mx-0">
+      <div class="col p-md-0">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="javascript:void(0)">Dashboard</a></li>
+          <li class="breadcrumb-item active"><a href="javascript:void(0)">Khoản thu</a></li>
+        </ol>
+      </div>
+    </div>
+    <!-- row -->
+
+    <div class="container-fluid">
+      <div class="row justify-content-center">
+
+        <div class="col-lg-12">
+          <div class="card">
+            <div class="card-body">
+              <h4 class="card-title">Thông tin lớp học</h4>
+              <div class="table-responsive">
+                <table class="table header-border table-hover verticle-middle table-bordered">
+                  <thead>
+                  <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Tên học sinh</th>
+                    <th scope="col">Năm sinh</th>
+                    <th scope="col">Những khoản còn thiếu</th>
+                    <th scope="col">Số tiền còn thiếu</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr th:each="student,i :${studentDtos}">
+                    <th th:text="${i.index+1}"></th>
+                    <td th:text="${student.fullName}"></td>
+                    <td th:text="${#dates.format(student.birthday,'dd/MM/yyyy')}"></td>
+                    <td th:text="${nameTuition[i.index]}"></td>
+                    <td th:text="${#numbers.formatDecimal(priceTuition[i.index], 0, 'DEFAULT',0, 'POINT')} + ' đ'"></td>
+                  </tr>
+                  </tbody>
+                </table>
+              </div>
+              <h4 class="text-right">Tổng tiền còn thiếu: <span th:text="${#numbers.formatDecimal(totalPrice, 0, 'DEFAULT',0, 'POINT')} + ' đ'"></span> </h4>
+            </div>
+          </div>
+
+        </div>
+
+
+
+
+      </div>
+    </div>
+    <!-- #/ container -->
+  </div>
+  <!--**********************************
+      Content body end
+  ***********************************-->
+
+
+  <!--**********************************
+      Footer start
+  ***********************************-->
+  <div th:replace="fragment/footer :: footer">
+  </div>
+  <!--**********************************
+      Footer end
+  ***********************************-->
+</div>
+<!--**********************************
+    Main wrapper end
+***********************************-->
+
+<!--**********************************
+    Scripts
+***********************************-->
+
+<script th:src="@{/plugins/chart.js/Chart.bundle.min.js}"></script>
+<script th:inline="javascript">
+  var label = [[${labels}]]
+  var data = [[${data}]]
+
+  // single bar chart
+  let ctx = document.getElementById("BarChartStatistic");
+  ctx.height = 150;
+  let myChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      // labels: ["Sun", "Mon", "Tu", "Wed", "Th", "Fri", "Sat"],
+      labels: label,
+      datasets: [
+        {
+          label: "Phần trăm ",
+          // data: [40, 55, 75, 81, 56, 55, 40],
+          data: data,
+          borderColor: "rgba(117, 113, 249, 0.9)",
+          borderWidth: "0",
+          backgroundColor: "rgba(117, 113, 249, 0.5)"
+        }
+      ]
+    },
+    options: {
+      scales: {
+        yAxes: [{
+          ticks: {
+            beginAtZero: true
+          }
+        }]
+      }
+    }
+  });
+
+</script>
+
+<!--<script th:src="@{/js/plugins-init/chartjs-init.js}"></script>-->
+<!--**********************************
+    Scripts
+***********************************-->
+<script th:src="@{/plugins/common/common.min.js}"></script>
+<script th:src="@{/js/custom.min.js}"></script>
+<script th:src="@{/js/settings.js}"></script>
+<script th:src="@{/js/gleek.js}"></script>
+<script th:src="@{/js/styleSwitcher.js}"></script>
+
+
+
+</body>
+
+</html>

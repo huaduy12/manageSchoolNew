@@ -127,6 +127,7 @@
                                                     <a class="dropdown-item btn btn-primary"  th:href="@{/manage/class/classDetail(id=${classroom.id})}">Học sinh</a>
                                                     <a th:if="${confirmHomeroom}" class="dropdown-item btn btn-primary"  th:href="@{/manage/class/subject(id=${classroom.id})}">Xem môn học</a>
                                                     <a th:if="${confirmHomeroom}" class="dropdown-item btn btn-primary"  th:href="@{/manage/class/subjectTeacher(id=${classroom.id})}">Giáo viên bộ môn</a>
+                                                    <a th:if="${confirmHomeroom}" class="dropdown-item btn btn-primary"  th:href="@{/teacher/tuition(id=${classroom.id})}">Thông tin học phí</a>
                                                 </div>
                                             </div>
                                         </td>

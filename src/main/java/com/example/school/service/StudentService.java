@@ -26,7 +26,7 @@ public interface StudentService {
     public void save(Student student);
     public void saveProfileStudent(FormProfileStudent formProfileStudent);
 
-
+    public int countStudentByClass(int class_id);
     public Boolean delete(int id);
     public Student findById(int id);
     public StudentDto findByIdDto(int id);

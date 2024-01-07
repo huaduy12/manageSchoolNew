@@ -156,8 +156,14 @@ public class ManageClass {
             }
             return "/subject_class";
         }
-        teacherClassService.saveSubjectClass(formSubjectClass);
-        redirectAttributes.addFlashAttribute("changeSuccess","Lưu thành công");
+
+        boolean isSave =  teacherClassService.saveSubjectClass(formSubjectClass);
+        if(isSave){
+            redirectAttributes.addFlashAttribute("changeSuccess","Lưu thành công");
+        }
+        else {
+            redirectAttributes.addFlashAttribute("changeFail","Lưu thất bại");
+        }
         return "redirect:/manage/class/subject?id=" + formSubjectClass.getClassroomId();
     }
 

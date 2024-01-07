@@ -5,6 +5,7 @@ import com.example.school.dto.ClassroomDto;
 import com.example.school.dto.StudentDto;
 import com.example.school.dto.TeacherDto;
 import com.example.school.dto.Teacher_classDto;
+import com.example.school.entity.RevenueClass;
 import com.example.school.entity.Teacher_class;
 import com.example.school.entity.User;
 import com.example.school.form.classroom.FormClassroom;
@@ -12,9 +13,12 @@ import com.example.school.form.student.FormStudent;
 import com.example.school.form.teacher.FormManageTeacher;
 import com.example.school.security.EntityUserDetail;
 import com.example.school.service.ClassroomService;
+import com.example.school.service.StudentService;
 import com.example.school.service.TeacherClassService;
 import com.example.school.service.TeacherService;
 import com.example.school.service.account.UserService;
+import com.example.school.service.revenue.RevenueClassService;
+import com.example.school.service.revenue.RevenueDetailService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -27,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Controller
@@ -38,11 +43,14 @@ public class ClassroomStudy {
     @Autowired
     private UserService userService;
     @Autowired
-    private ClassroomService classroomService;
-    @Autowired
-    private ModelMapper modelMapper;
-    @Autowired
     private TeacherClassService teacherClassService;
+    @Autowired
+    private StudentService studentService;
+    @Autowired
+    private RevenueClassService revenueClassService;
+
+    @Autowired
+    private RevenueDetailService revenueDetailService;
 
     @GetMapping("/homeroom")
     public String getHomeRoomClass(Model model,@RequestParam(value = "keyword",required = false) String keyword,
@@ -111,4 +119,49 @@ public class ClassroomStudy {
 
         return "/teacher/classroom_score";
     }
+
+    @GetMapping("/tuition")
+    public String getClassTuition(@RequestParam("id") String id,Model model){
+        Integer idClass =null;
+        try{
+            idClass = Integer.parseInt(id);
+        }catch (Exception e){
+            return "redirect:/teacher/homeroom";
+        }
+        List<StudentDto> studentDtos = studentService.getStudentByClassIdDto(idClass);
+
+        // các khoản thu áp dụng cho lớp đó
+        List<RevenueClass> revenueClasses = revenueClassService.getRevenueClassByClass(idClass);
+
+        // tên, giá học phí những khoản còn thiếu của từng học sinh
+        List<String> nameTuition = new ArrayList<>();
+        List<Long> priceTuition = new ArrayList<>();
+        long total = 0;
+        for (StudentDto studentDto: studentDtos) {
+            String name = "";
+            Long price = 0l;
+            for (RevenueClass revenueClass: revenueClasses) {
+                if(!revenueDetailService.existRevenueByStudent_idAndRevenue_id(studentDto.getId(),revenueClass.getRevenue().getId())){
+                       name += revenueClass.getRevenue().getName() + ", ";
+                       price += revenueClass.getRevenue().getPrice();
+                }
+            }
+            nameTuition.add(name);
+            priceTuition.add(price);
+            total += price;
+        }
+        List<String> nameTuitionCorrect = new ArrayList<>();
+        for (String name : nameTuition) {
+            nameTuitionCorrect.add(name.trim().substring(0,name.length()-2));
+        }
+
+
+
+        model.addAttribute("studentDtos",studentDtos);
+        model.addAttribute("nameTuition",nameTuitionCorrect);
+        model.addAttribute("priceTuition",priceTuition);
+        model.addAttribute("totalPrice",total);
+        return "teacher/statistics_homeroom";
+    }
+
 }

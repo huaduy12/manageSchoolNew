@@ -25,5 +25,5 @@ public interface TeacherClassService {
     public Boolean deleteSubjectClass(int id);
 
     public List<Teacher_class> getClassroomByTeacher(int role, int teacher_id);
-
+    public boolean isExistTeacher_class(int year_id,int semester_id,int class_id,int subject_id);
 }

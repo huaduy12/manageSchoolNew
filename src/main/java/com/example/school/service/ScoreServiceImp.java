@@ -89,8 +89,11 @@ public class ScoreServiceImp implements ScoreService{
             List<StudentDto> studentDtos = studentService.getStudentByClassIdDto(teacher_class.getClassroom().getId());
             List<Score> scores = new ArrayList<>();
             for (StudentDto s : studentDtos) {
+                System.out.println(teacher_class.getSchool_year().getId() + " " +
+                        teacher_class.getSemester().getId() + " " + s.getId() + " " + teacher_class.getSubject().getId());
                 Score score = findByStudentIdAndSubjectId(teacher_class.getSchool_year().getId(),
                         teacher_class.getSemester().getId(),s.getId(),teacher_class.getSubject().getId());
+
                 scores.add(score);
             }
             List<ScoreDto> scoreDtos = null;

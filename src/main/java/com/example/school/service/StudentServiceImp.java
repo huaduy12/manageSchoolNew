@@ -115,6 +115,11 @@ public class StudentServiceImp implements StudentService{
     }
 
     @Override
+    public int countStudentByClass(int class_id) {
+        return studentRepository.countAllByClassroom_Id(class_id);
+    }
+
+    @Override
     public Boolean delete(int id) {
         Student student = findById(id);
         if(student != null){

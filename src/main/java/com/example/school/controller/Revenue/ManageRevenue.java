@@ -6,13 +6,17 @@ import com.example.school.dto.School_yearDto;
 import com.example.school.dto.SemesterDto;
 import com.example.school.entity.Classroom;
 import com.example.school.entity.RevenueClass;
+import com.example.school.entity.Student;
 import com.example.school.form.classroom.FormClassroom;
 import com.example.school.form.revenue.FormRevenue;
 import com.example.school.repository.SchoolYearRepository;
 import com.example.school.repository.SemesterRepository;
+import com.example.school.repository.StudentRepository;
 import com.example.school.service.ClassroomService;
+import com.example.school.service.StudentService;
 import com.example.school.service.YearSemesterService;
 import com.example.school.service.revenue.RevenueClassService;
+import com.example.school.service.revenue.RevenueDetailService;
 import com.example.school.service.revenue.RevenueService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +26,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,14 +37,21 @@ public class ManageRevenue {
     private RevenueClassService revenueClassService;
     private YearSemesterService yearSemesterService;
     private ClassroomService classroomService;
+    private StudentService studentService;
+    private RevenueDetailService revenueDetailService;
 
     @Autowired
+    private StudentRepository studentRepository;
+    @Autowired
     public ManageRevenue(RevenueService revenueService, YearSemesterService yearSemesterService,
-                         ClassroomService classroomService, RevenueClassService revenueClassService) {
+                         ClassroomService classroomService, RevenueClassService revenueClassService,
+                         StudentService studentService,RevenueDetailService revenueDetailService) {
         this.revenueService = revenueService;
         this.yearSemesterService = yearSemesterService;
         this.classroomService = classroomService;
         this.revenueClassService = revenueClassService;
+        this.studentService = studentService;
+        this.revenueDetailService = revenueDetailService;
     }
 
     @GetMapping(value = {"/",""})
@@ -145,4 +157,77 @@ public class ManageRevenue {
     }
 
 
+    @GetMapping("/statistics/{id}")
+    public String getRevenueStatistic(@PathVariable("id") String id,Model model){
+        Integer idRevenue =null;
+        try{
+            idRevenue = Integer.parseInt(id);
+        }catch (Exception e){
+            return "redirect:/manage/revenue";
+        }
+        // lấy các lớp áp dụng khoản thu  --> dc labels
+        List<RevenueClass> revenueClasses = revenueClassService.getRevenueClassByRevenue(idRevenue);
+        List<String> nameClasses = new ArrayList<>();
+        for (RevenueClass revenueClass: revenueClasses) {
+            nameClasses.add(revenueClass.getClassroom().getName());
+        }
+
+        // tổng học sinh tứng lớp tương ứng
+        List<Integer> totalStudent = new ArrayList<>();
+        for (RevenueClass revenueClass : revenueClasses){
+            totalStudent.add(studentService.countStudentByClass(revenueClass.getClassroom().getId()));
+        }
+
+        // tổng số học sinh của lớp tương ứng đã đóng tiền
+        List<Integer> totalStudentTuition = new ArrayList<>();
+        for (RevenueClass revenueClass: revenueClasses) {
+            List<Student> listStudentClass = studentService.getStudentByClassId(revenueClass.getClassroom().getId());
+            int count =0;
+            if(listStudentClass != null){
+                for (Student student: listStudentClass) {
+                    if(revenueDetailService.existRevenueByStudent_idAndRevenue_id(student.getId(),idRevenue)){
+                        count++;
+                    };
+                }
+            }
+            totalStudentTuition.add(count);
+        }
+        // tính tỷ lệ phần trăm
+        List<Double> percentStudentTuition = new ArrayList<>();
+        for (int i = 0; i < revenueClasses.size(); i++) {
+            if(totalStudent.get(i) != 0){
+                percentStudentTuition.add(roundToTwoDecimalPlaces(((totalStudentTuition.get(i)*1.0)/totalStudent.get(i))*100));
+            }else {
+                percentStudentTuition.add(0.0);
+            }
+        }
+
+        // tính số tiền học sinh đã đóng
+        List<Long> moneyTuition = new ArrayList<>();
+        for (int i = 0; i < revenueClasses.size(); i++) {
+            moneyTuition.add(totalStudentTuition.get(i) * revenueClasses.get(i).getRevenue().getPrice());
+        }
+
+        // tính số tiền đang thiếu
+        List<Long> moneyTuitionNotPaid = new ArrayList<>();
+        for (int i = 0; i < revenueClasses.size(); i++) {
+            moneyTuitionNotPaid.add(totalStudent.get(i)*revenueClasses.get(i).getRevenue().getPrice() - moneyTuition.get(i));
+        }
+
+
+        model.addAttribute("labels",nameClasses);
+        model.addAttribute("data",percentStudentTuition);
+        model.addAttribute("totalStudentTuition",totalStudentTuition);
+        model.addAttribute("totalStudent",totalStudent);
+        model.addAttribute("moneyTuition",moneyTuition);
+        model.addAttribute("moneyTuitionNotPaid",moneyTuitionNotPaid);
+
+        return "revenue/revenue_statistics";
+    }
+
+    // Phương thức để làm tròn hai chữ số sau dấu thập phân
+    private static double roundToTwoDecimalPlaces(double value) {
+        DecimalFormat df = new DecimalFormat("#.##");
+        return Double.parseDouble(df.format(value));
+    }
 }

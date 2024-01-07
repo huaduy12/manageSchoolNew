@@ -127,6 +127,13 @@ public class TeacherClassServiceImp implements TeacherClassService{
     }
 
     @Override
+    public boolean isExistTeacher_class(int year_id, int semester_id, int class_id, int subject_id) {
+        Teacher_class teacher_class = teacherClassRepository.findByAssign(year_id,semester_id,class_id,subject_id);
+        return teacher_class != null ? true : false;
+    }
+
+
+    @Override
     public Boolean save(Teacher_class teacher_class, int id_class) {
 
         if(teacher_class != null){
@@ -148,8 +155,13 @@ public class TeacherClassServiceImp implements TeacherClassService{
         Teacher teacher = teacherService.findById(formSubjectClass.getTeacherId());
         Subject subject = subjectService.findById(formSubjectClass.getSubjectId());
         Classroom classroom = classroomService.findById(formSubjectClass.getClassroomId());
+
+        // nếu đã được phân công rồi thì return luôn
+        if(isExistTeacher_class(school_year.getId(),semester.getId(),classroom.getId(),subject.getId())){
+            return false;
+        }
          // nếu chưa tồn tại thì thực hiện việc song song tao bảng điểm và thêm teacher_class;
-        if(teacher_classEdit == null){
+        else if(teacher_classEdit == null && !isExistTeacher_class(school_year.getId(),semester.getId(),classroom.getId(),subject.getId())){
             Teacher_class teacher_class = new Teacher_class();
             teacher_class.setRole(1);
             teacher_class.setSchool_year(school_year);
